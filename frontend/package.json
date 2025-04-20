@@ -14,7 +14,7 @@
     "axios": "^1.8.2",
     "formik": "^2.4.6",
     "framer-motion": "^12.6.3",
-    "next": "15.2.1",
+    "next": "^15.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
