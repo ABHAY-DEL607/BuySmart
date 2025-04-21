@@ -1,35 +1,42 @@
 require('dotenv').config();
 const express = require('express');
-const UserRouter = require('./routers/UserRouters');
+const mongoose = require('mongoose');
 const cors = require('cors');
- 
-const app = express();
 
+// Import all routers
+const UserRouter = require('./routers/UserRouters');
+const ProductRouter = require('./routers/ProductRoutes');
+const ComparisonRouter = require('./routers/ComparisonRoutes');
+const PlatformRouter = require('./routers/PlatformRoutes');
+
+const app = express();
 const port = process.env.PORT || 5000;
 
-//middleware
-app.use(cors({origin: '*'}))
+// Middleware
+app.use(cors({ origin: '*' }));
 app.use(express.json());
-app.use('/user',UserRouter);
 
-// endpoint or route
-app.get('/', (req,res) => {
-    res.send('response from add');
+// MongoDB Connection
+mongoose.connect(process.env.DB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => {
+    console.log('MongoDB connected successfully');
+}).catch((err) => {
+    console.error('MongoDB connection error:', err);
 });
 
-app.get('/add', (req, res) => {
-    res.send('response from add');
-});
+// Routers
+app.use('/user', UserRouter);
+app.use('/product', ProductRouter);
+app.use('/comparison', ComparisonRouter);
+app.use('/platform', PlatformRouter);
 
-// getall
-app.get('/getall', (req, res) => {
-    res.send('response from getall');
-});
-// delete
-app.get('/delete', (req, res) => {
-    res.send('response from delete');
+// Base endpoint
+app.get('/', (req, res) => {
+    res.send('Response from Express');
 });
 
 app.listen(port, () => {
-    console.log('server started');
+    console.log(`Server started on port ${port}`);
 });
