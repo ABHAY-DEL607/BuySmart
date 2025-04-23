@@ -4,10 +4,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 // Import all routers
-const UserRouter = require('./routers/UserRouters');
-const ProductRouter = require('./routers/ProductRoutes');
-const ComparisonRouter = require('./routers/ComparisonRoutes');
-const PlatformRouter = require('./routers/PlatformRoutes');
+const UserRouter = require('./routers/UserRouter');
+const ProductRouter = require('./routers/ProductRouter');
+const ComparisonRouter = require('./routers/ComparisonRouter');
+const PlatformRouter = require('./routers/PlatformRouter');
 
 const app = express();
 const port = process.env.PORT || 5000;
