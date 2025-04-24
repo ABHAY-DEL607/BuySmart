@@ -8,7 +8,7 @@
       "default_icon": "icons/not-recording.png"
     },
     "background": {
-      "service_worker": "service-worker.js"
+      "service_worker": "serviceworker.js"
     },
     "permissions": ["tabCapture", "offscreen"]
   }
