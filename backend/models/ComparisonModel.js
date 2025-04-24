@@ -1,21 +1,13 @@
 const { Schema, model } = require('mongoose');
 
 const comparisonSchema = new Schema({
-  productId: {
-    type: Schema.Types.ObjectId,
-    ref: 'Product',
+  comparisonData: {
+    type: Array,
     required: true,
   },
-  userId: {
+  user: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  platforms: {
-    type: [String],
-    required: true,
-  },
-  bestDeal: {
-    type: String,
+    ref: 'users',
   },
   comparedAt: {
     type: Date,
