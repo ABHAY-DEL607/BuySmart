@@ -9,7 +9,7 @@ const ManageUser = () => {
 const [userList, setUserList] = useState([]);
 
     const fetchUsers = async () => {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/users/getall`);
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/user/getall`);
         const data = res.data;
         console.table(data);
         setUserList(data);
@@ -20,7 +20,7 @@ const [userList, setUserList] = useState([]);
     }, []);
 
     const deleteUser = async (id) => {
-      const res= await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/users/delete/${id}`);
+      const res= await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/user/delete/${id}`);
       toast.success('User deleted successfully!');
       fetchUsers();
     }
