@@ -1,89 +1,56 @@
-const express = require('express');
+const express = require("express");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("../models/UserModels"); // Adjust the path as necessary
+
 const router = express.Router();
 
-const Model = require('../models/usermodel');
-const JWT = require('jsonwebtoken');
-require('dotenv').config();
+router.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  console.log("Register request received:", req.body);
+  try {
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      console.log("User already exists:", username);
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-router.post('/add', (req, res) => {
-    console.log(req.body);
-    
-    new Model(req.body).save()
-    .then((result) => {
-        res.status(200).json(result);
-    })
-    .catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ username, password: hashedPassword });
+    await newUser.save();
+
+    console.log("User registered successfully:", username);
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (err) {
+    console.error("Error during registration:", err.message);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 });
 
 router.get('/getall', (req, res) => {
-    Model.find()
+    User.find()
     .then((result) => {
         res.status(200).json(result);
     }).catch((err) => {
         res.status(500).json(err);
     });
 });
-// : denotes url parameter
-router.get('/getbyemail/:email', (req,res) => {
-    console.log(req.params.email)
-    res.send('response from user getbyemail');
+
+router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign({ id: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
 });
-
-// getbyid
-router.get('/getbyid', (req, res) => {
-    res.send('response from user getbyid');
-});
-
-// update
-router.put('/update', (req, res) => {
-    res.send('response from user update');
-});
-
-// delete
-router.delete('/delete/:id', (req, res) => {
-    Model.findByIdAndDelete(req.params.id)
-    .then((result) => {
-        res.status(200).json(result);
-    }).catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-    });
-});
-router.post('/authenticate', (req,res) => {
-    Model.findOne(req.body)
-    .then((result) => {
-
-        if(result){
-            //login success-generate token
-            const { _id, name, email } = result;
-            const payload = { _id, name, email };
-            JWT.sign(
-                payload,
-                process.env.JWT_SECRET,
-                { expiresIn: '2d'},
-                (err, token) => {
-                    if(err){
-                        console.log(err);
-                        res.status(500).json(err);
-                    }else {
-                        res.status(200).json({token});
-                    }
-                }
-            )
-       
-
-        }else{
-            //login failed -send error message
-            res.status(401).json({message : 'invalid username or password'});
-        }
-        
-    }).catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-    });
-})
 
 module.exports = router;

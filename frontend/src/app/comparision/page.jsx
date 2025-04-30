@@ -107,7 +107,7 @@ const products = [
     id: 5,
     site: "Paytm Mall",
     logo: "https://tse4.mm.bing.net/th?id=OIP.bWQ3aG57c_cY72dYLXnmEAHaC9&pid=Api&P=0&h=220",
-    productImage: "https://n4.sdlcdn.com/imgs/k/e/x/large/Samsung-Galaxy-M13-64GB-4GB-SDL185216633-1-7ba1b.jpg",
+    productImage: "https://s.yimg.com/lo/api/res/1.2/03T0BIMeDUa_5FPMRjWXUw--/YXBwaWQ9ZWNfaG9yaXpvbnRhbDtoPTQwMDtzcz0xO3c9NDAw/https://m.media-amazon.com/images/I/31jgoap1cQL._SL500_.jpg",
     price: 36000,
     discount: "7% off",
     rating: 3,
