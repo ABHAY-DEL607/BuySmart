@@ -201,7 +201,7 @@ const HomePage = () => {
       originalPrice: '₹35,000',
       discountedPrice: '₹29,999',
       platform: 'Amazon',
-      image: 'https://tse2.mm.bing.net/th?id=OIP.TmQm7AwM41aWy-oS-cKLrwHaEK&pid=Api&P=0&h=220',
+      image: 'https://images.unsplash.com/photo-1511707171634-5f89772885ad',
       link: '/deal/smartphone-x',
     },
     {
@@ -209,7 +209,7 @@ const HomePage = () => {
       originalPrice: '₹85,000',
       discountedPrice: '₹79,999',
       platform: 'Flipkart',
-      image: 'https://tse3.mm.bing.net/th?id=OIP.OjKqV2k6G_LSmm4yyL9MjQHaFE&pid=Api&P=0&h=220',
+      image: 'https://images.pexels.com/photos/1266984/pexels-photo-1266984.jpeg',
       link: '/deal/laptop-pro',
     },
     {
@@ -217,7 +217,7 @@ const HomePage = () => {
       originalPrice: '₹5,000',
       discountedPrice: '₹3,499',
       platform: 'JioMart',
-      image: 'https://tse3.mm.bing.net/th?id=OIP.rJJH619HD8r-Nsaqb10-0QHaDV&pid=Api&P=0&h=220',
+      image: 'https://images.pexels.com/photos/8534777/pexels-photo-8534777.jpeg',
       link: '/deal/wireless-earbuds',
     },
   ];
@@ -228,7 +228,7 @@ const HomePage = () => {
       originalPrice: '₹15,000',
       discountedPrice: '₹12,999',
       platform: 'Amazon',
-      image: 'https://tse4.mm.bing.net/th?id=OIP.NCbrOiKwLdiwipHXYJBDrwHaE-&pid=Api&P=0&h=220',
+      image: 'https://images.pexels.com/photos/2775132/pexels-photo-2775132.jpeg',
       link: '/deal/smartwatch',
     },
     {
@@ -236,7 +236,7 @@ const HomePage = () => {
       originalPrice: '₹45,000',
       discountedPrice: '₹39,999',
       platform: 'Flipkart',
-      image: 'https://tse2.mm.bing.net/th?id=OIP.UUIuXI_eCLSyZBMFlowQcAHaEo&pid=Api&P=0&h=220',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/PS5_and_DualSense.png',
       link: '/deal/gaming-console',
     },
     {
@@ -244,7 +244,7 @@ const HomePage = () => {
       originalPrice: '₹8,000',
       discountedPrice: '₹6,499',
       platform: 'JioMart',
-      image: 'https://tse3.mm.bing.net/th?id=OIP.AW1uVkqcE4WjMRn_OjLPQAHaEJ&pid=Api&P=0&h=220',
+      image: 'https://images.pexels.com/photos/4552967/pexels-photo-4552967.jpeg',
       link: '/deal/kitchen-appliance',
     },
     {
@@ -252,17 +252,17 @@ const HomePage = () => {
       originalPrice: '₹10,000',
       discountedPrice: '₹7,999',
       platform: 'eBay',
-      image: 'https://tse4.mm.bing.net/th?id=OIP.8pwxq_CA-jv1AG2P7I6eewHaEo&pid=Api&P=0&h=220',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e',
       link: '/deal/headphones',
     },
   ];
 
   const platforms = [
     { name: 'Amazon', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
-    { name: 'Flipkart', src: 'https://tse4.mm.bing.net/th?id=OIP.cnrLFSg62df-g-S9GG_1IgHaB8&pid=Api&P=0&h=220' },
-    { name: 'JioMart', src: 'https://tse3.mm.bing.net/th?id=OIP.e3Mqt4iIAMl_kRtD9e6jeQAAAA&pid=Api&P=0&h=220' },
+    { name: 'Flipkart', src: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Flipkart_Logo.svg' },
+    { name: 'JioMart', src: 'https://www.jiomart.com/assets/jiomart-default/logo.png' },
     { name: 'eBay India', src: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg' },
-    { name: 'Paytm Mall', src: 'https://tse4.mm.bing.net/th?id=OIP.bWQ3aG57c_cY72dYLXnmEAHaC9&pid=Api&P=0&h=220' },
+    { name: 'Paytm Mall', src: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Paytm_Mall_Logo.svg' },
   ];
 
   const howItWorks = [
@@ -383,7 +383,7 @@ const HomePage = () => {
             </form>
             <div className="mt-8">
               <Image
-                src="https://www.addictioncenter.com/app/uploads/2020/01/online_shopping_addiction-scaled.jpeg"
+                src="https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg"
                 alt="Online shopping interface with product deals"
                 width={1200}
                 height={600}
