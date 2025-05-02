@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const statusElement = document.getElementById("status");
     const saveButton = document.getElementById("saveButton");
 
+    const API_URL = "http://localhost:5000";
+
     // Check if the user is already logged in
     const token = localStorage.getItem("token");
     if (token) {
@@ -21,43 +23,72 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Login User
-    loginButton.addEventListener("click", () => {
+    loginButton.addEventListener("click", async () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
-        fetch("http://localhost:5000/user/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        })
-        .then(res => res.json())
-        .then(data => {
+
+        if (!username || !password) {
+            authMessage.innerText = "Please enter both username and password";
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Login failed");
+            }
+
             if (data.token) {
                 localStorage.setItem("token", data.token);
                 authSection.classList.add("hidden");
                 priceSection.classList.remove("hidden");
                 logoutButton.classList.remove("hidden");
+                authMessage.innerText = "";
                 loadPriceComparison();
-            } else {
-                authMessage.innerText = data.message || "Login failed";
             }
-        })
-        .catch(err => console.error("Login error:", err));
+        } catch (err) {
+            authMessage.innerText = err.message || "Login failed. Please try again.";
+            console.error("Login error:", err);
+        }
     });
 
     // Register User
-    registerButton.addEventListener("click", () => {
+    registerButton.addEventListener("click", async () => {
         const username = usernameInput.value;
         const password = passwordInput.value;
-        fetch("http://localhost:5000/user/register", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password })
-        })
-        .then(res => res.json())
-        .then(data => {
-            authMessage.innerText = data.message || "Registration failed";
-        })
-        .catch(err => console.error("Registration error:", err));
+
+        if (!username || !password) {
+            authMessage.innerText = "Please enter both username and password";
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/auth/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Registration failed");
+            }
+
+            authMessage.innerText = "Registration successful! Please login.";
+            usernameInput.value = "";
+            passwordInput.value = "";
+        } catch (err) {
+            authMessage.innerText = err.message || "Registration failed. Please try again.";
+            console.error("Registration error:", err);
+        }
     });
 
     // Logout User
@@ -66,10 +97,13 @@ document.addEventListener("DOMContentLoaded", function () {
         authSection.classList.remove("hidden");
         priceSection.classList.add("hidden");
         logoutButton.classList.add("hidden");
+        authMessage.innerText = "";
+        usernameInput.value = "";
+        passwordInput.value = "";
     });
 
     // Load price comparison data
-    function loadPriceComparison() {
+    async function loadPriceComparison() {
         chrome.runtime.sendMessage({ action: "getProductData" }, (response) => {
             if (!response || !response.data) {
                 statusElement.innerText = "No product data available.";
@@ -94,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 saveButton.classList.remove("hidden");
 
                 saveButton.addEventListener("click", () => {
-                    fetch("http://localhost:5000/api/prices", {
+                    fetch(`${API_URL}/api/prices`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
