@@ -3,6 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import Image from 'next/image';
 import Head from 'next/head';
+import ShapeBlur from '@/components/shapeblur';
+
+
+
 
 const HomePage = () => {
   const [compareQuery, setCompareQuery] = useState('');
@@ -267,7 +271,7 @@ const HomePage = () => {
 
   const howItWorks = [
     { step: 'Search', description: 'Enter a product name in the search bar.', icon: '🔍' },
-    { step: 'Compare', description: 'View deals from top platforms.', icon: '⚖️' },
+    { step: 'Compare', description: 'View deals from top platforms.', icon: '⚖' },
     { step: 'Save', description: 'Choose the best offer and shop smart.', icon: '💸' },
   ];
 
