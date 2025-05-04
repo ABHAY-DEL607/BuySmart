@@ -35,7 +35,7 @@ const Signup = () => {
             console.log(values);
 
             try {
-                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/user/add`, values);
+                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/add`, values);
                 console.log(res.status);
                 console.log(res.data);
                 toast.success('Account created successfully');

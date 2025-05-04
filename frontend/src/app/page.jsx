@@ -937,9 +937,15 @@ const HomePage = () => {
                   {["twitter", "facebook", "instagram"].map((social) => (
                     <a
                       key={social}
+<<<<<<< HEAD
                       href={`https://${social}.com}
                       className="text-slate-400 hover:text-white transition-colors"
                       aria-label={Follow us on ${social}`}
+=======
+                      href={`https://${social}.com`}
+                      className="text-slate-400 hover:text-white transition-colors"
+                      aria-label={`Follow us on ${social}`}
+>>>>>>> f0aed074ae65a48033a355318b6d212a4321c359
                     >
                       <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
                         <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -1024,4 +1030,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage;
+export default HomePage
