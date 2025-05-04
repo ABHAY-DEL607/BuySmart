@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import * as THREE from 'three';
 
 const products = [
   {
@@ -130,8 +131,77 @@ const products = [
   },
 ];
 
+const create3DBackground = (canvas) => {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  // Add animated cubes
+  const cubes = [];
+  for (let i = 0; i < 20; i++) {
+    const geometry = new THREE.BoxGeometry();
+    const material = new THREE.MeshBasicMaterial({ 
+      color: 0x0066ff,
+      opacity: 0.1,
+      transparent: true 
+    });
+    const cube = new THREE.Mesh(geometry, material);
+    cube.position.set(
+      Math.random() * 20 - 10,
+      Math.random() * 20 - 10,
+      Math.random() * 20 - 10
+    );
+    scene.add(cube);
+    cubes.push(cube);
+  }
+
+  camera.position.z = 5;
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+    cubes.forEach(cube => {
+      cube.rotation.x += 0.01;
+      cube.rotation.y += 0.01;
+    });
+    renderer.render(scene, camera);
+  };
+
+  animate();
+
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+};
+
 const ProductComparison = () => {
   const [sortedProducts, setSortedProducts] = useState(products);
+  const canvasRef = useRef(null);
+
+  // Initialize 3D background
+  useEffect(() => {
+    if (canvasRef.current) {
+      try {
+        create3DBackground(canvasRef.current);
+      } catch (error) {
+        console.error('3D background initialization failed:', error);
+      }
+    }
+  }, []);
+
+  // Find the best deal
+  const findBestDeal = (products) => {
+    return products.reduce((best, current) => {
+      const currentTotal = current.price + current.deliveryPrice + current.platformFee;
+      const bestTotal = best.price + best.deliveryPrice + best.platformFee;
+      return currentTotal < bestTotal ? current : best;
+    }, products[0]);
+  };
+
+  const bestDeal = findBestDeal(products);
 
   const handleFilter = (value) => {
     let sorted = [...products];
@@ -150,11 +220,37 @@ const ProductComparison = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 py-10 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* 3D Background Canvas */}
+      <canvas
+        ref={canvasRef}
+        className="fixed top-0 left-0 w-full h-full -z-10 opacity-30"
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-10">
+        {/* Your existing header */}
         <h1 className="text-4xl font-extrabold text-center mb-10 bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-pink-500 animate-fadeInUp">
           BuySmart Product Comparison
         </h1>
+
+        {/* Best Deal Highlight */}
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl backdrop-blur-sm border border-blue-500/30">
+          <h2 className="text-2xl font-bold text-white mb-4">🏆 Best Deal</h2>
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <img src={bestDeal.productImage} alt={bestDeal.site} className="w-32 h-32 object-cover rounded-lg" />
+            <div>
+              <h3 className="text-xl font-semibold text-white">{bestDeal.site}</h3>
+              <p className="text-green-400 text-lg font-bold">₹{bestDeal.price.toLocaleString()}</p>
+              <p className="text-yellow-400">{bestDeal.discount}</p>
+              <p className="text-white/80">Total Cost: ₹{(bestDeal.price + bestDeal.deliveryPrice + bestDeal.platformFee).toLocaleString()}</p>
+              <a href={bestDeal.link} target="_blank" rel="noopener noreferrer">
+                <button className="mt-3 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-all hover:scale-105">
+                  Get This Deal
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
 
         {/* Filter Dropdown */}
         <div className="flex justify-center mb-8 ">
@@ -251,5 +347,5 @@ const ProductComparison = () => {
 };
 
 export default ProductComparison;
-                
+
 
