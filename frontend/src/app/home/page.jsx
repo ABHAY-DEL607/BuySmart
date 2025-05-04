@@ -201,7 +201,7 @@ const HomePage = () => {
       originalPrice: '₹35,000',
       discountedPrice: '₹29,999',
       platform: 'Amazon',
-      image: 'https://tse2.mm.bing.net/th?id=OIP.TmQm7AwM41aWy-oS-cKLrwHaEK&pid=Api&P=0&h=220',
+      image: 'https://tse3.mm.bing.net/th?id=OIP.5QMkXIlusvZfEUm50okfbAHaHa&pid=Api&P=0&h=220',
       link: '/deal/smartphone-x',
     },
     {
@@ -209,7 +209,7 @@ const HomePage = () => {
       originalPrice: '₹85,000',
       discountedPrice: '₹79,999',
       platform: 'Flipkart',
-      image: 'https://tse3.mm.bing.net/th?id=OIP.OjKqV2k6G_LSmm4yyL9MjQHaFE&pid=Api&P=0&h=220',
+      image: 'https://images.pexels.com/photos/1266984/pexels-photo-1266984.jpeg',
       link: '/deal/laptop-pro',
     },
     {
@@ -217,7 +217,7 @@ const HomePage = () => {
       originalPrice: '₹5,000',
       discountedPrice: '₹3,499',
       platform: 'JioMart',
-      image: 'https://tse3.mm.bing.net/th?id=OIP.rJJH619HD8r-Nsaqb10-0QHaDV&pid=Api&P=0&h=220',
+      image: 'https://images.pexels.com/photos/8534777/pexels-photo-8534777.jpeg',
       link: '/deal/wireless-earbuds',
     },
   ];
@@ -228,7 +228,7 @@ const HomePage = () => {
       originalPrice: '₹15,000',
       discountedPrice: '₹12,999',
       platform: 'Amazon',
-      image: 'https://tse4.mm.bing.net/th?id=OIP.NCbrOiKwLdiwipHXYJBDrwHaE-&pid=Api&P=0&h=220',
+      image: 'https://tse3.mm.bing.net/th?id=OIP.9nAQZ8cnxNNa68IFrcal0QHaEo&pid=Api&P=0&h=220',
       link: '/deal/smartwatch',
     },
     {
@@ -236,7 +236,7 @@ const HomePage = () => {
       originalPrice: '₹45,000',
       discountedPrice: '₹39,999',
       platform: 'Flipkart',
-      image: 'https://tse2.mm.bing.net/th?id=OIP.UUIuXI_eCLSyZBMFlowQcAHaEo&pid=Api&P=0&h=220',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/PS5_and_DualSense.png',
       link: '/deal/gaming-console',
     },
     {
@@ -244,7 +244,7 @@ const HomePage = () => {
       originalPrice: '₹8,000',
       discountedPrice: '₹6,499',
       platform: 'JioMart',
-      image: 'https://tse3.mm.bing.net/th?id=OIP.AW1uVkqcE4WjMRn_OjLPQAHaEJ&pid=Api&P=0&h=220',
+      image: 'https://tse4.mm.bing.net/th?id=OIP.yRw-mYMyN7Niu2cmtX-GUQHaFj&pid=Api&P=0&h=220',
       link: '/deal/kitchen-appliance',
     },
     {
@@ -252,7 +252,7 @@ const HomePage = () => {
       originalPrice: '₹10,000',
       discountedPrice: '₹7,999',
       platform: 'eBay',
-      image: 'https://tse4.mm.bing.net/th?id=OIP.8pwxq_CA-jv1AG2P7I6eewHaEo&pid=Api&P=0&h=220',
+      image: 'https://tse4.mm.bing.net/th?id=OIP.rxZdUqnvzJuGGTkPqkb_KAHaId&pid=Api&P=0&h=220',
       link: '/deal/headphones',
     },
   ];
@@ -383,7 +383,7 @@ const HomePage = () => {
             </form>
             <div className="mt-8">
               <Image
-                src="https://www.addictioncenter.com/app/uploads/2020/01/online_shopping_addiction-scaled.jpeg"
+                src="https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg"
                 alt="Online shopping interface with product deals"
                 width={1200}
                 height={600}
