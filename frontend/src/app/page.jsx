@@ -327,14 +327,6 @@ const HomePage = () => {
 
   return (
     <>
-      <Head>
-        <title>BuySmart - Browser Extension for Price Comparison</title>
-        <meta
-          name="description"
-          content="BuySmart browser extension automatically compares prices across top Indian e-commerce sites while you shop."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
       <div className="min-h-screen flex flex-col relative font-sans bg-slate-50">
         {/* Three.js Canvas */}
         <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-30" />
@@ -936,16 +928,12 @@ const HomePage = () => {
                 <div className="flex space-x-4">
                   {["twitter", "facebook", "instagram"].map((social) => (
                     <a
-                      key={social}
-<<<<<<< HEAD
+                      key={social} HEAD
                       href={`https://${social}.com}
                       className="text-slate-400 hover:text-white transition-colors"
                       aria-label={Follow us on ${social}`}
-=======
-                      href={`https://${social}.com`}
-                      className="text-slate-400 hover:text-white transition-colors"
-                      aria-label={`Follow us on ${social}`}
->>>>>>> f0aed074ae65a48033a355318b6d212a4321c359
+
+                    
                     >
                       <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
                         <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -1030,4 +1018,4 @@ const HomePage = () => {
   )
 }
 
-export default HomePage
+export default HomePage;
