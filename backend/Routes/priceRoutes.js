@@ -1,6 +1,6 @@
 const express = require("express");
 const PriceHistory = require("../models/PriceHistory");
-const authenticateToken = require("../middleware/authmiddleware");
+const authenticateToken = require("../middleware/auth");
 
 const router = express.Router();
 
