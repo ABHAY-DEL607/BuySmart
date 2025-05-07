@@ -1,8 +1,20 @@
 /** @type {import('tailwindcss').Config} */
-// tailwind.config.js
 module.exports = {
+  content: [
+    './src/app/**/*.{js,ts,jsx,tsx}',
+    './src/components/**/*.{js,ts,jsx,tsx}',
+  ],
   theme: {
     extend: {
+      fontFamily: {
+        anton: ['"Anton"', 'sans-serif'],
+        barlow: ['"Barlow"', 'sans-serif'],
+        oswald: ['"Oswald"', 'sans-serif'],
+        inter: ['"Inter"', 'sans-serif'],
+        montserrat: ['"Montserrat"', 'sans-serif'],
+        poppins: ['"Poppins"', 'sans-serif'],
+        bebas: ['"Bebas Neue"', 'sans-serif'],
+      },
       animation: {
         fadeInUp: 'fadeInUp 0.6s ease-out both',
       },
@@ -14,26 +26,5 @@ module.exports = {
       },
     },
   },
-};
-
-module.exports = {
-    content: [
-      './src/app//*.{js,ts,jsx,tsx}',
-      './src/components//*.{js,ts,jsx,tsx}',
-    ],
-    theme: {
-      extend: {
-        fontFamily: {
-          anton: ['"Anton"', 'sans-serif'],
-          barlow: ['"Barlow"', 'sans-serif'],
-          oswald: ['"Oswald"', 'sans-serif'],
-          inter: ['"Inter"', 'sans-serif'],
-          montserrat: ['"Montserrat"', 'sans-serif'],
-          poppins: ['"Poppins"', 'sans-serif'],
-          bebas: ['"Bebas Neue"', 'sans-serif'],
-        },
-      },
-    },
-    plugins: [],
-  };
-  
+  plugins: [],
+}
