@@ -1,39 +1,48 @@
 const supportedSites = [
     {
         domain: "flipkart.com",
-        productNameSelector: "span.VU-ZEz",
-        productPriceSelector: "div.Nx9bqj.CxhGGd",
+        productNameSelector: "span.B_NuCI",
+        productPriceSelector: "div._30jeq3._16Jk6d",
         searchUrl: "https://www.flipkart.com/search?q={query}",
-        searchResultsContainer: "div._75nlfW",
-        titleSelector: "div.KzDlHZ",
-        priceSelector: "div.Nx9bqj._4b5DiR"
+        searchResultsContainer: "div._1AtVbE.col-12-12",
+        titleSelector: "div._4rR01T",
+        priceSelector: "div._30jeq3._1_WHN1"
     },
     {
         domain: "amazon.in",
         productNameSelector: "#productTitle",
-        productPriceSelector: ".a-price-whole",
+        productPriceSelector: "span.a-price-whole",
         searchUrl: "https://www.amazon.in/s?k={query}",
-        searchResultsContainer: ".sg-col-20-of-24.s-result-item.s-asin.sg-col-0-of-12.sg-col-16-of-20.AdHolder.sg-col.s-widget-spacing-small.sg-col-12-of-16",
-        titleSelector: ".a-size-medium.a-spacing-none.a-color-base.a-text-normal span",
-        priceSelector: ".a-price-whole "
+        searchResultsContainer: "div.s-result-item.s-asin",
+        titleSelector: "span.a-size-medium",
+        priceSelector: "span.a-price-whole"
     },
     {
-        domain: "snapdeal.com",
-        productNameSelector: ".pdp-e-i-head",
-        productPriceSelector: ".payBlkBig",
-        searchUrl: "https://www.snapdeal.com/search?keyword={query}",
-        searchResultsContainer: ".product-tuple-listing",
-        titleSelector: ".product-title",
-        priceSelector: ".lfloat.product-price"
+        domain: "paytmmall.com",
+        productNameSelector: "h1.NZJI",
+        productPriceSelector: "span._1V3w",
+        searchUrl: "https://paytmmall.com/shop/search?q={query}",
+        searchResultsContainer: "div._3WhJ",
+        titleSelector: "div._2apC",
+        priceSelector: "span._1kMS"
     },
     {
-        domain: "myntra.com",
-        productNameSelector: ".pdp-title",
-        productPriceSelector: ".pdp-price",
-        searchUrl: "https://www.myntra.com/{query}",
-        searchResultsContainer: ".results-base .product-base",
-        titleSelector: ".product-product",
-        priceSelector: ".product-price"
+        domain: "ebay.com",
+        productNameSelector: "h1.x-item-title__mainTitle",
+        productPriceSelector: "span.x-price-primary",
+        searchUrl: "https://www.ebay.com/sch/i.html?_nkw={query}",
+        searchResultsContainer: "li.s-item",
+        titleSelector: "div.s-item__title",
+        priceSelector: "span.s-item__price"
+    },
+    {
+        domain: "jiomart.com",
+        productNameSelector: "h1.title",
+        productPriceSelector: "div.price-box span.final-price",
+        searchUrl: "https://www.jiomart.com/search/{query}",
+        searchResultsContainer: "div.product-item",
+        titleSelector: "div.product-name",
+        priceSelector: "span.final-price"
     }
 ];
 
