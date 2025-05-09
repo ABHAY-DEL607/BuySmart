@@ -8,8 +8,9 @@
     "host_permissions": [
         "https://www.amazon.in/*",
         "https://www.flipkart.com/*",
-        "https://www.myntra.com/*",
-        "https://www.snapdeal.com/*",
+        "https://paytmmall.com/*",
+        "https://www.ebay.com/*",
+        "https://www.jiomart.com/*",
         "http://localhost:5000/*"
     ],
     "background": {
@@ -20,8 +21,9 @@
             "matches": [
                 "https://www.amazon.in/*",
                 "https://www.flipkart.com/*",
-                "https://www.myntra.com/*",
-                "https://www.snapdeal.com/*"
+                "https://paytmmall.com/*",
+                "https://www.ebay.com/*",
+                "https://www.jiomart.com/*"
             ],
             "js": ["content.js"]
         }
