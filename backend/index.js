@@ -39,7 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 
 // API Routes
-app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/notifications', notificationRoutes);

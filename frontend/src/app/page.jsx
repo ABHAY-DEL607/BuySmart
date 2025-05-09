@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from "react"
 import * as THREE from "three"
 import Image from "next/image"
-import Head from "next/head"
 import {
   Search,
   ShoppingCart,
@@ -928,12 +927,10 @@ const HomePage = () => {
                 <div className="flex space-x-4">
                   {["twitter", "facebook", "instagram"].map((social) => (
                     <a
-                      key={social} HEAD
-                      href={`https://${social}.com}
+                      key={social}
+                      href={`https://${social}.com`}
                       className="text-slate-400 hover:text-white transition-colors"
-                      aria-label={Follow us on ${social}`}
-
-                    
+                      aria-label={`Follow us on ${social}`}
                     >
                       <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
                         <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">

@@ -179,9 +179,12 @@ const create3DBackground = (canvas) => {
 
 const ProductComparison = () => {
   const [sortedProducts, setSortedProducts] = useState(products);
+  const [priceHistory, setPriceHistory] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const canvasRef = useRef(null);
 
-  // Initialize 3D background
+  // Initialize 3D background and fetch price history
   useEffect(() => {
     if (canvasRef.current) {
       try {
@@ -190,6 +193,46 @@ const ProductComparison = () => {
         console.error('3D background initialization failed:', error);
       }
     }
+
+    // Fetch price history
+    const fetchPriceHistory = async () => {
+      try {
+        setIsLoading(true);
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+          setError('Please login to view your price history');
+          setIsLoading(false);
+          return;
+        }
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/prices`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            setError('Please login to view your price history');
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return;
+        }
+
+        const data = await response.json();
+        // Ensure data is an array
+        setPriceHistory(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching price history:', error);
+        setError('Failed to load price history');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPriceHistory();
   }, []);
 
   // Find the best deal
@@ -250,6 +293,43 @@ const ProductComparison = () => {
               </a>
             </div>
           </div>
+        </div>
+
+        {/* Price History Section */}
+        <div className="mb-8 p-6 bg-white/10 rounded-xl backdrop-blur-sm border border-blue-500/30">
+          <h2 className="text-2xl font-bold text-white mb-4">📊 Your Price History</h2>
+          {isLoading ? (
+            <div className="text-center text-white/70">Loading price history...</div>
+          ) : error ? (
+            <div className="text-center text-red-400">{error}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Array.isArray(priceHistory) && priceHistory.length > 0 ? (
+                priceHistory.map((item, index) => (
+                  <div key={index} className="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                    <h3 className="font-semibold text-white mb-2">{item.productName}</h3>
+                    <p className="text-blue-200">Current Site: {item.currentSite}</p>
+                    <p className="text-green-300">Price: ₹{item.currentPrice}</p>
+                    <div className="mt-2">
+                      <p className="text-yellow-200 text-sm font-semibold">Comparisons:</p>
+                      <ul className="space-y-1 mt-1">
+                        {item.comparisons?.map((comp, idx) => (
+                          <li key={idx} className="text-white/80 text-sm">
+                            {comp.site}: ₹{comp.price}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <p className="text-gray-300 text-xs mt-2">
+                      Saved on: {new Date(item.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-white/70 col-span-3">No price history available. Start comparing products to build your history!</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Filter Dropdown */}

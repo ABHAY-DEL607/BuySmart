@@ -52,6 +52,9 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    css: false, // Disable lightningcss
+  },
 };
 
 export default nextConfig;
