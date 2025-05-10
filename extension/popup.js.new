@@ -44,6 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
         priceSection.classList.add("hidden");
         logoutButton.classList.add("hidden");
         authMessage.innerText = "";
+        usernameInput.value = "";
+        passwordInput.value = "";
     });
 
     // Load price comparison data
@@ -98,15 +100,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Listen for messages from the website
-    chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
-        if (request.type === 'LOGIN_SUCCESS' || request.type === 'SIGNUP_SUCCESS') {
-            // Store the token
-            localStorage.setItem('token', request.token);
-            // Update UI
-            authSection.classList.add("hidden");
-            priceSection.classList.remove("hidden");
-            logoutButton.classList.remove("hidden");
-            loadPriceComparison();
+    window.addEventListener('message', function(event) {
+        // Make sure the message is from our website
+        if (event.origin === WEBSITE_URL) {
+            if (event.data.type === 'LOGIN_SUCCESS' || event.data.type === 'SIGNUP_SUCCESS') {
+                // Store the token
+                localStorage.setItem('token', event.data.token);
+                // Update UI
+                authSection.classList.add("hidden");
+                priceSection.classList.remove("hidden");
+                logoutButton.classList.remove("hidden");
+                loadPriceComparison();
+            }
         }
     });
 });

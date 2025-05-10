@@ -2,6 +2,7 @@
 import axios from 'axios';
 import { useFormik } from 'formik';
 import React from 'react';
+import { EXTENSION_ID } from '@/services/config';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
@@ -30,23 +31,56 @@ const Signup = () => {
             password: '',
             confirmPassword: ''
         },
-
+        validationSchema: SignupSchema,
         onSubmit: async (values) => {
-            console.log(values);
-
             try {
-                const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users/add`, values);
-                console.log(res.status);
-                console.log(res.data);
-                toast.success('Account created successfully');
+                const res = await axios.post(`${API_URL}/users/add`, values);
+                
+                // Registration successful
+                toast.success('Account created successfully!');
+                
+                // Handle extension communication if user came from extension
+                const returnToExtension = localStorage.getItem('return_to_extension');
+                if (returnToExtension) {
+                    localStorage.removeItem('return_to_extension'); // Clean up
+                    
+                    try {
+                        // Try sending message via chrome runtime API
+                        if (chrome?.runtime?.sendMessage && EXTENSION_ID) {
+                            chrome.runtime.sendMessage(EXTENSION_ID, {
+                                type: 'SIGNUP_SUCCESS',
+                                token: res.data.token,
+                                user: res.data.user
+                            });
+                        } else {
+                            // Fallback to postMessage
+                            window.opener?.postMessage({
+                                type: 'SIGNUP_SUCCESS',
+                                token: res.data.token,
+                                user: res.data.user
+                            }, '*');
+                        }
+                        // Close this tab after showing the success message
+                        setTimeout(() => window.close(), 1500);
+                    } catch (msgError) {
+                        console.error('Failed to communicate with extension:', msgError);
+                        toast.error('Registration successful but failed to connect to extension. Please close this tab and try logging in from the extension.');
+                    }
+                } else {
+                    // Regular website flow - redirect to login
+                    router.push('/login');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                if (error.code === 'ERR_NETWORK') {
+                    toast.error('Unable to connect to server. Please try again later.');
+                } else if (error.response?.data?.message) {
+                    toast.error(error.response.data.message);
+                } else {
+                    toast.error('Registration failed. Please try again.');
+                }
             }
-            catch (error) {
-                console.log(error);
-                toast.error('Something went wrong');
-            }
-        },
-
-        validationSchema: SignupSchema
+        }
     });
 
     return (

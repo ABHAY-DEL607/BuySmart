@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { EXTENSION_ID } from '@/services/config';
 
 const Login = () => {
     const router = useRouter();
@@ -27,15 +28,27 @@ const Login = () => {
         onSubmit: async (values, { resetForm, setSubmitting }) => {
             try {
                 const result = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, values);
-                // Store token in localStorage
-                localStorage.setItem('token', result.data.token);
+                // Store token in localStorage                localStorage.setItem('token', result.data.token);
                 // Store user info if available
                 if (result.data.user) {
                     localStorage.setItem('user', JSON.stringify(result.data.user));
                 }
                 toast.success('Login successful!');
-                // Navigate to home page
-                router.push('/home');
+
+                // Check if user came from extension
+                const returnToExtension = localStorage.getItem('return_to_extension');
+                if (returnToExtension) {
+                    localStorage.removeItem('return_to_extension'); // Clean up                    // Send message to extension
+                    chrome.runtime.sendMessage(EXTENSION_ID, {
+                        type: 'LOGIN_SUCCESS',
+                        token: result.data.token
+                    });
+                    // Close this tab after a short delay
+                    setTimeout(() => window.close(), 1500);
+                } else {
+                    // Regular website flow - navigate to home page
+                    router.push('/home');
+                }
                 // Reset form
                 resetForm();
             } catch (err) {
@@ -61,26 +74,26 @@ const Login = () => {
                         <div className="flex flex-col gap-4 p-4 md:p-8">
                             <div>
                                 <label
-                                    htmlFor="username"
+                                    htmlFor="email"
                                     className="mb-2 inline-block text-sm text-gray-800 sm:text-base"
                                 >
-                                    UserName
+                                    Email
                                 </label>
                                 <input
-                                    id="username"
-                                    name="username"
-                                    type="text"
+                                    id="email"
+                                    name="email"
+                                    type="email"
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    value={formik.values.username || ''}
+                                    value={formik.values.email || ''}
                                     className={`w-full rounded border ${
-                                        formik.touched.username && formik.errors.username 
+                                        formik.touched.email && formik.errors.email
                                             ? 'border-red-500' 
                                             : 'border-gray-300'
                                     } bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring`}
                                 />
-                                {formik.touched.username && formik.errors.username ? (
-                                    <div className="mt-1 text-sm text-red-500">{formik.errors.username}</div>
+                                {formik.touched.email && formik.errors.email ? (
+                                    <div className="mt-1 text-sm text-red-500">{formik.errors.email}</div>
                                 ) : null}
                             </div>
                             <div>
