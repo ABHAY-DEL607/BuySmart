@@ -46,7 +46,6 @@ const supportedSites = [
     }
 ];
 
-// Updated fetchPricesFromOtherSites to wait for the tab to fully load
 function fetchPricesFromOtherSites(productName, currentSite) {
     return Promise.all(
         supportedSites
@@ -66,7 +65,7 @@ function fetchPricesFromOtherSites(productName, currentSite) {
                                 chrome.tabs.remove(tabId);
                                 let price = "Not Found";
                                 if (chrome.runtime.lastError) {
-                                    console.error(chrome.runtime.lastError);
+                                    console.error(`Error scraping ${site.domain}:`, chrome.runtime.lastError);
                                 } else if (results && results[0] && results[0].result) {
                                     price = results[0].result.price || "Not Found";
                                 }
@@ -76,17 +75,21 @@ function fetchPricesFromOtherSites(productName, currentSite) {
                     });
                 });
             }))
-    );
+    ).catch(err => {
+        console.error("Error fetching prices:", err);
+        return [];
+    });
 }
 
 function scrapePrice(site) {
     const firstResult = document.querySelector(site.searchResultsContainer);
     if (!firstResult) return null;
     const priceElement = firstResult.querySelector(site.priceSelector);
-    return { price: priceElement?.innerText.trim() };
+    return { price: priceElement?.innerText.trim() || "Not Found" };
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("Message received:", message);
     if (message.action === "getProductData") {
         chrome.storage.local.get(["productData"], (result) => {
             sendResponse({ data: result.productData || null });
@@ -97,11 +100,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "productData") {
         if (!message.data) {
             console.error("Received empty product data");
+            sendResponse({ success: false });
             return;
         }
         chrome.storage.local.set({ productData: message.data }, () => {
             console.log("Product data saved successfully");
+            sendResponse({ success: true });
         });
+        return true;
     }
 
     if (message.action === "comparePrices") {
@@ -115,12 +121,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "getSupportedSites") {
         sendResponse({ supportedSites });
     }
-});
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log("Message received: ", message);
     if (message.action === "fetchData") {
         sendResponse({ success: true, data: "Sample Data" });
     }
-    return true; // Keeps the message port open for async responses
+    return true;
 });

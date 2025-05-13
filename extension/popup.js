@@ -5,48 +5,73 @@ document.addEventListener("DOMContentLoaded", function () {
     const loginButton = document.getElementById("loginButton");
     const registerButton = document.getElementById("registerButton");
     const logoutButton = document.getElementById("logoutButton");
-    const usernameInput = document.getElementById("username");
-    const passwordInput = document.getElementById("password");
     const pricesElement = document.getElementById("prices");
     const statusElement = document.getElementById("status");
     const saveButton = document.getElementById("saveButton");
+    const smartTipElement = document.getElementById("smartTip");
 
-    const API_URL = "http://localhost:5000";
-    const WEBSITE_URL = "http://localhost:3000";
+    const API_URL = "http://localhost:5000"; // Update to your production API URL, e.g., "https://api.buysmart.com"
+    const WEBSITE_URL = "http://localhost:3000"; // Update to your production website URL, e.g., "https://buysmart.com"
 
-    // Check if the user is already logged in
+    const smartTips = [
+        "Smart Tip: Compare prices across multiple sites!",
+        "Smart Tip: Check reviews before buying!",
+        "Smart Tip: Look for coupon codes!",
+        "Smart Tip: Save more with bulk purchases!",
+        "Smart Tip: Check for No Cost EMI on Flipkart!",
+        "Smart Tip: Look for Authenticity Guarantee on eBay!"
+    ];
+
+    function rotateSmartTip() {
+        let index = 0;
+        smartTipElement.textContent = smartTips[index];
+        setInterval(() => {
+            index = (index + 1) % smartTips.length;
+            smartTipElement.textContent = smartTips[index];
+        }, 5000);
+    }
+
+    if (!window.chrome || !chrome.runtime) {
+        statusElement.innerText = "Please enable JavaScript in your browser to use this extension.";
+        authSection.classList.add("hidden");
+        priceSection.classList.remove("hidden");
+        smartTipElement.classList.add("hidden");
+        return;
+    }
+
     const token = localStorage.getItem("token");
     if (token) {
         authSection.classList.add("hidden");
         priceSection.classList.remove("hidden");
         logoutButton.classList.remove("hidden");
+        smartTipElement.classList.add("hidden");
         loadPriceComparison();
+    } else {
+        rotateSmartTip();
     }
 
-    // Login User - Redirect to website
     loginButton.addEventListener("click", () => {
-        // Store return_to in local storage to indicate the user came from extension
+        console.log('Login button clicked, redirecting to:', `${WEBSITE_URL}/login`);
         localStorage.setItem('return_to_extension', 'true');
         chrome.tabs.create({ url: `${WEBSITE_URL}/login` });
     });
 
-    // Register User - Redirect to website
     registerButton.addEventListener("click", () => {
-        // Store return_to in local storage to indicate the user came from extension
+        console.log('Register button clicked, redirecting to:', `${WEBSITE_URL}/signup`);
         localStorage.setItem('return_to_extension', 'true');
         chrome.tabs.create({ url: `${WEBSITE_URL}/signup` });
     });
 
-    // Logout User
     logoutButton.addEventListener("click", () => {
         localStorage.removeItem("token");
         authSection.classList.remove("hidden");
         priceSection.classList.add("hidden");
         logoutButton.classList.add("hidden");
+        smartTipElement.classList.remove("hidden");
         authMessage.innerText = "";
+        rotateSmartTip();
     });
 
-    // Load price comparison data
     async function loadPriceComparison() {
         chrome.runtime.sendMessage({ action: "getProductData" }, (response) => {
             if (!response || !response.data) {
@@ -54,12 +79,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const { productName, productPrice, site } = response.data;
-            pricesElement.innerHTML = `
+            const { productName, productPrice, site, discount, specialOffer } = response.data;
+            let priceHTML = `
                 <h3>${productName}</h3>
                 <p><strong>${site} Price:</strong> ${productPrice}</p>
-                <p><strong>Comparing Prices...</strong></p>
             `;
+
+            if (discount) {
+                priceHTML += `<p><strong>Discount:</strong> ${discount}</p>`;
+            }
+            if (specialOffer) {
+                priceHTML += `<p><strong>Special Offer:</strong> ${specialOffer}</p>`;
+            }
+
+            if (site.toLowerCase().includes("flipkart")) {
+                priceHTML += `<p><em>Eligible for Flipkart Plus benefits and No Cost EMI!</em></p>`;
+            } else if (site.toLowerCase().includes("ebay")) {
+                priceHTML += `<p><em>Comes with eBay Authenticity Guarantee!</em></p>`;
+            }
+
+            priceHTML += `<p><strong>Comparing Prices...</strong></p>`;
+            pricesElement.innerHTML = priceHTML;
 
             chrome.runtime.sendMessage({ action: "comparePrices", data: { productName, site } }, (comparisonResponse) => {
                 if (!comparisonResponse || !comparisonResponse.prices) {
@@ -67,8 +107,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                let comparisons = comparisonResponse.prices.map(({ site, price }) => 
-                    `<p><strong>${site}:</strong> ${price}</p>`).join("");
+                let comparisons = comparisonResponse.prices.map(({ site, price }) => {
+                    return `<p><strong>${site}:</strong> ${price}</p>`;
+                }).join("");
                 pricesElement.innerHTML += comparisons;
                 saveButton.classList.remove("hidden");
 
@@ -97,15 +138,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Listen for messages from the website
     chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
         if (request.type === 'LOGIN_SUCCESS' || request.type === 'SIGNUP_SUCCESS') {
-            // Store the token
             localStorage.setItem('token', request.token);
-            // Update UI
             authSection.classList.add("hidden");
             priceSection.classList.remove("hidden");
             logoutButton.classList.remove("hidden");
+            smartTipElement.classList.add("hidden");
             loadPriceComparison();
         }
     });

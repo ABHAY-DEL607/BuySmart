@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import React from 'react';
 import { EXTENSION_ID } from '@/services/config';
+import { API_URL } from '@/services/config';
 import { toast } from 'react-toastify';
 import * as Yup from 'yup';
 
@@ -34,7 +35,10 @@ const Signup = () => {
         validationSchema: SignupSchema,
         onSubmit: async (values) => {
             try {
-                const res = await axios.post(`${API_URL}/users/add`, values);
+                const res = await axios.post(`${API_URL}/auth/register`, {
+                    username: values.name,
+                    password: values.password
+                });
                 
                 // Registration successful
                 toast.success('Account created successfully!');

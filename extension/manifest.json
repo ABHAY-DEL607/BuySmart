@@ -3,23 +3,22 @@
     "name": "BuySmart (Search,Compare,Save)",
     "version": "1.0",
     "description": "Compare product prices across different Indian e-commerce sites",
-    "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation"],    "host_permissions": [
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "tabs",
+        "webNavigation"
+    ],
+    "host_permissions": [
         "https://www.amazon.in/*",
         "https://www.flipkart.com/*",
-<<<<<<< HEAD
         "https://www.paytmmall.com/*",
         "https://www.jiomart.com/*",
         "https://www.ebay.com/*",
         "http://localhost:5000/*",
         "http://localhost:3000/*"
-=======
-        "https://paytmmall.com/*",
-        "https://www.ebay.com/*",
-        "https://www.jiomart.com/*",
-        "http://localhost:5000/*"
->>>>>>> f737c5fb5de3561748809498752e7115a5c7c015
     ],
-    
     "externally_connectable": {
         "matches": ["http://localhost:3000/*"]
     },
@@ -29,19 +28,11 @@
     "content_scripts": [
         {
             "matches": [
-<<<<<<< HEAD
-        "https://www.amazon.in/*",
-        "https://www.flipkart.com/*",
-        "https://www.paytmmall.com/*",
-        "https://www.jiomart.com/*",
-        "https://www.ebay.com/*"
-=======
                 "https://www.amazon.in/*",
                 "https://www.flipkart.com/*",
-                "https://paytmmall.com/*",
-                "https://www.ebay.com/*",
-                "https://www.jiomart.com/*"
->>>>>>> f737c5fb5de3561748809498752e7115a5c7c015
+                "https://www.paytmmall.com/*",
+                "https://www.jiomart.com/*",
+                "https://www.ebay.com/*"
             ],
             "js": ["content.js"]
         }

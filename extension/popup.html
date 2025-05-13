@@ -2,35 +2,264 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Price Tracker</title>
+    <title>BuySmart: Shop Savvy</title>
     <script src="popup.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body { width: 300px; padding: 10px; font-family: Arial, sans-serif; }
-        #status { font-style: italic; color: #666; }
-        button { padding: 8px; margin-top: 10px; cursor: pointer; width: 100%; }
-        input { width: 100%; padding: 8px; margin: 5px 0; }
-        .hidden { display: none; }
+        :root {
+            --primary-color: #3b82f6;
+            --secondary-color: #6366f1;
+            --text-dark: #f8fafc;
+            --bg-gradient: linear-gradient(135deg, #181c2f 0%, #232946 60%, #3b82f6 100%);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            color: var(--text-dark);
+            font-family: 'Poppins', Arial, sans-serif;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        #popup-container {
+            width: 340px;
+            max-width: 340px;
+            min-width: 340px;
+            padding: 25px;
+            box-sizing: border-box;
+            height: auto;
+            max-height: 100%;
+            margin: 0;
+            border-radius: 15px;
+            background: url('data:image/svg+xml;utf8,<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg"><g opacity="0.08"><rect x="10" y="10" width="32" height="32" rx="6" fill="%233b82f6"/><circle cx="90" cy="30" r="16" fill="%2310b981"/><rect x="60" y="70" width="36" height="18" rx="5" fill="%23f59e42"/><path d="M20 100 l20 -10 l10 20 z" fill="%23f43f5e"/></g></svg>') repeat;
+            background-size: 120px 120px;
+            filter: brightness(1.1) blur(0.2px);
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            z-index: 1;
+        }
+
+        h2 {
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 2em;
+            font-weight: 800;
+            text-align: center;
+            margin: 18px 0 10px 0;
+            color: var(--text-dark);
+            letter-spacing: 1px;
+            z-index: 2;
+            text-shadow: 0 0 12px #3b82f6, 0 2px 16px #232946, 0 0 8px #fff2;
+        }
+        h2 .buysmart-gradient {
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            font-weight: 800;
+            text-shadow: 0 0 18px #3b82f6, 0 2px 16px #232946, 0 0 8px #fff2;
+        }
+
+        #status {
+            font-style: italic;
+            color: #6b7280;
+            text-align: center;
+            font-size: 16px;
+            z-index: 1;
+        }
+
+        button {
+            padding: 12px;
+            margin: 10px 0;
+            cursor: pointer;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color), #2563eb);
+            border: none;
+            color: #fff;
+            font-family: 'Poppins', Arial, sans-serif;
+            font-size: 18px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            text-shadow: 0 0 8px #3b82f6, 0 2px 8px #232946, 0 0 4px #fff2;
+        }
+
+        button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        button::after {
+            display: none !important;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #authMessage {
+            color: #6b7280;
+            text-align: center;
+            font-size: 16px;
+            margin: 5px 0;
+            z-index: 1;
+        }
+
+        #logo {
+            display: block;
+            margin: 0 auto 10px;
+            width: 50px;
+            height: 50px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%233b82f6"><path d="M21 6h-4.5c0-2.76-2.24-5-5-5S6.5 3.24 6.5 6H2v15c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-9.5-3c1.66 0 3 1.34 3 3h-6c0-1.66 1.34-3 3-3zm8.5 18H4V8h16v13z"/></svg>') no-repeat center;
+            background-size: contain;
+            z-index: 1;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        #logo:hover {
+            transform: scale(1.1);
+        }
+
+        #smartTip {
+            font-size: 15px;
+            color: #fff;
+            text-align: center;
+            margin: 10px 0;
+            padding: 15px;
+            background: rgba(16, 185, 129, 0.18);
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: pulseTip 2s infinite ease-in-out;
+            text-shadow: 0 0 10px #10b981, 0 2px 8px #232946, 0 0 4px #fff2;
+        }
+
+        #prices {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #prices h3 {
+            color: #fff;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        #prices p {
+            color: rgba(255, 255, 255, 0.9);
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseTip {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        #popup-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 400px) {
+            #popup-container { 
+                width: 100%; 
+                padding: 20px; 
+            }
+            h2 { font-size: 20px; }
+            button { font-size: 16px; padding: 10px; }
+            #smartTip { font-size: 12px; padding: 8px; }
+            #logo { width: 40px; height: 40px; }
+        }
+
+        /* E-commerce themed animated icons */
+        .bg-ecom-icon {
+            position: absolute;
+            opacity: 0.18;
+            z-index: -2;
+            pointer-events: none;
+            animation-timing-function: ease-in-out;
+        }
+        .bg-ecom-cart {
+            width: 60px;
+            height: 60px;
+            top: 20px;
+            left: 10px;
+            animation: floatCart 10s infinite alternate;
+        }
+        .bg-ecom-bag {
+            width: 50px;
+            height: 50px;
+            bottom: 30px;
+            right: 20px;
+            animation: floatBag 12s infinite alternate-reverse;
+        }
+        .bg-ecom-tag {
+            width: 40px;
+            height: 40px;
+            top: 80px;
+            right: 60px;
+            animation: floatTag 14s infinite alternate;
+        }
+        @keyframes floatCart {
+            0% { transform: translateY(0) scale(1) rotate(-10deg); opacity: 0.15; }
+            50% { transform: translateY(18px) scale(1.08) rotate(8deg); opacity: 0.22; }
+            100% { transform: translateY(-10px) scale(1.03) rotate(-5deg); opacity: 0.18; }
+        }
+        @keyframes floatBag {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.15; }
+            50% { transform: translateY(-15px) scale(1.1) rotate(10deg); opacity: 0.22; }
+            100% { transform: translateY(10px) scale(0.97) rotate(-8deg); opacity: 0.18; }
+        }
+        @keyframes floatTag {
+            0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.13; }
+            30% { transform: translate(-8px, 8px) scale(1.1) rotate(10deg); opacity: 0.19; }
+            60% { transform: translate(8px, -8px) scale(0.95) rotate(-10deg); opacity: 0.16; }
+            100% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.13; }
+        }
     </style>
 </head>
 <body>
-    <h2>Price Tracker</h2>
-
-    <!-- Login/Register Section -->
+  <div id="popup-container">
+    <!-- E-commerce animated SVG icons -->
+    <svg class="bg-ecom-icon bg-ecom-cart" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#3b82f6" opacity="0.12"/><path d="M14 17h20l-2 12H16l-2-12z" stroke="#3b82f6" stroke-width="2" fill="#fff"/><circle cx="19" cy="35" r="2" fill="#3b82f6"/><circle cx="29" cy="35" r="2" fill="#3b82f6"/></svg>
+    <svg class="bg-ecom-icon bg-ecom-bag" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#10b981" opacity="0.12"/><rect x="16" y="18" width="16" height="14" rx="3" stroke="#10b981" stroke-width="2" fill="#fff"/><path d="M19 22v-2a5 5 0 0 1 10 0v2" stroke="#10b981" stroke-width="2"/></svg>
+    <svg class="bg-ecom-icon bg-ecom-tag" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#f59e42" opacity="0.12"/><rect x="16" y="20" width="16" height="8" rx="2" stroke="#f59e42" stroke-width="2" fill="#fff"/><circle cx="20" cy="24" r="1.5" fill="#f59e42"/></svg>
+    <div id="logo" onclick="chrome.tabs.create({ url: 'http://localhost:3000' })"></div>
+    <h2><span class="buysmart-gradient">BuySmart</span>: Shop Savvy</h2>
+    <div id="smartTip" aria-live="polite">Smart Tip: Compare prices across multiple sites!</div>
+    
     <div id="authSection">
-        <input type="text" id="username" placeholder="Username">
-        <input type="password" id="password" placeholder="Password">
         <button id="loginButton">Login</button>
         <button id="registerButton">Register</button>
         <p id="authMessage"></p>
     </div>
-
-    <!-- Price Comparison Section (Hidden until logged in) -->
+    
     <div id="priceSection" class="hidden">
         <div id="status">Loading...</div>
         <div id="prices"></div>
         <button id="saveButton" class="hidden">Save History</button>
     </div>
-
+    
     <button id="logoutButton" class="hidden">Logout</button>
+  </div>
 </body>
 </html>
