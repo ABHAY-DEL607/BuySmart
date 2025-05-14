@@ -1,12 +1,10 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import Image from 'next/image';
 import Head from 'next/head';
-import ShapeBlur from '@/components/shapeblur';
-
-
-
+import { Search, X } from 'lucide-react';
 
 const HomePage = () => {
   const [compareQuery, setCompareQuery] = useState('');
@@ -19,7 +17,6 @@ const HomePage = () => {
   const handleCompare = (e) => {
     e.preventDefault();
     console.log('Comparing:', compareQuery);
-    // Placeholder for API call
   };
 
   // Handle newsletter signup
@@ -27,7 +24,6 @@ const HomePage = () => {
     e.preventDefault();
     console.log('Newsletter signup:', newsletterEmail);
     setNewsletterEmail('');
-    // Placeholder for API call
   };
 
   // Toggle help modal
@@ -49,14 +45,18 @@ const HomePage = () => {
     if (isHelpOpen) modalRef.current?.focus();
   }, [isHelpOpen]);
 
-  // E-commerce Themed 3D Background
+  // Enhanced 3D Background
   useEffect(() => {
     if (!canvasRef.current) return;
 
     try {
       const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      // Gradient background (navy to indigo)
+      // Gradient background
       const gradientTexture = new THREE.CanvasTexture(
         (() => {
           const canvas = document.createElement('canvas');
@@ -64,8 +64,8 @@ const HomePage = () => {
           canvas.height = 512;
           const context = canvas.getContext('2d');
           const gradient = context.createLinearGradient(0, 0, 0, 512);
-          gradient.addColorStop(0, '#0a0a1a');
-          gradient.addColorStop(1, '#1e1e3f');
+          gradient.addColorStop(0, '#1e1e3f');
+          gradient.addColorStop(1, '#0a0a1a');
           context.fillStyle = gradient;
           context.fillRect(0, 0, 512, 512);
           return canvas;
@@ -73,17 +73,36 @@ const HomePage = () => {
       );
       scene.background = gradientTexture;
 
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, alpha: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
       // Lighting
-      const ambientLight = new THREE.AmbientLight(0x4040ff, 0.3);
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
       scene.add(ambientLight);
-      const directionalLight = new THREE.DirectionalLight(0x8888ff, 0.7);
-      directionalLight.position.set(10, 10, 10);
-      scene.add(directionalLight);
+      const pointLight = new THREE.PointLight(0x8888ff, 1, 100);
+      pointLight.position.set(10, 10, 10);
+      scene.add(pointLight);
+
+      // Floating Particles
+      const particleCount = 200;
+      const particles = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 50;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 50;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 50;
+        colors[i * 3] = Math.random();
+        colors[i * 3 + 1] = Math.random();
+        colors[i * 3 + 2] = 1;
+      }
+      particles.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      particles.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      const particleMaterial = new THREE.PointsMaterial({
+        size: 0.2,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+      });
+      const particleSystem = new THREE.Points(particles, particleMaterial);
+      scene.add(particleSystem);
 
       // E-commerce product icons (simplified cubes)
       const productCount = 15;
@@ -145,6 +164,13 @@ const HomePage = () => {
 
       camera.position.z = 30;
 
+      // OrbitControls for subtle camera movement
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableZoom = false;
+      controls.enablePan = false;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.5;
+
       // Mouse interaction
       let mouseX = 0, mouseY = 0;
       const onMouseMove = (event) => {
@@ -158,6 +184,14 @@ const HomePage = () => {
       const animate = () => {
         requestAnimationFrame(animate);
         const time = clock.getElapsedTime();
+
+        // Animate particles
+        particleSystem.rotation.y += 0.001;
+        const positions = particleSystem.geometry.attributes.position.array;
+        for (let i = 0; i < particleCount; i++) {
+          positions[i * 3 + 1] += Math.sin(time * 0.5 + i) * 0.01;
+        }
+        particleSystem.geometry.attributes.position.needsUpdate = true;
 
         // Animate products
         products.children.forEach((mesh) => {
@@ -173,9 +207,10 @@ const HomePage = () => {
         });
 
         // Parallax
-        products.rotation.x = mouseY * 0.03;
-        products.rotation.y = mouseX * 0.03;
+        products.rotation.x = mouseY * 0.05;
+        products.rotation.y = mouseX * 0.05;
 
+        controls.update();
         renderer.render(scene, camera);
       };
       animate();
@@ -311,10 +346,10 @@ const HomePage = () => {
   return (
     <>
       <Head>
-        <title>BuySmart - Find the Best Deals Across Top Platforms</title>
+        <title>BuySmart - Discover the Best Deals Instantly</title>
         <meta
           name="description"
-          content="Discover the best deals on Amazon, Flipkart, JioMart, eBay India, and Paytm Mall with BuySmart."
+          content="Find the best deals on Amazon, Flipkart, JioMart, and more with BuySmart."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -322,13 +357,13 @@ const HomePage = () => {
         {/* Three.js Canvas */}
         <canvas
           ref={canvasRef}
-          className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-20"
+          className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none opacity-30"
         />
 
         {/* Help Floating Button */}
         <button
           onClick={toggleHelp}
-          className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-lg hover:scale-105 hover:shadow-[0_0_15px_rgba(79,70,229,0.6)] transition-transform duration-200 z-50"
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-lg hover:scale-110 hover:shadow-[0_0_20px_rgba(79,70,229,0.7)] transition-all duration-300 z-50"
           aria-label="Open help modal"
           aria-expanded={isHelpOpen}
         >
@@ -337,19 +372,26 @@ const HomePage = () => {
 
         {/* Help Modal */}
         {isHelpOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
             <div
               ref={modalRef}
               tabIndex={-1}
-              className="bg-white p-6 rounded-xl shadow-2xl max-w-md w-full"
+              className="bg-white/95 backdrop-blur-lg p-8 rounded-2xl shadow-2xl max-w-lg w-full relative animate-slide-in"
             >
-              <h3 className="text-xl font-bold mb-4 text-gray-800">Welcome to BuySmart</h3>
-              <p className="text-gray-600 mb-6 text-sm">
-                Search for any product to find the best deals across Amazon, Flipkart, JioMart, eBay India, and Paytm Mall. Save big with BuySmart!
+              <button
+                onClick={toggleHelp}
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+                aria-label="Close help modal"
+              >
+                <X size={24} />
+              </button>
+              <h3 className="text-2xl font-bold mb-4 text-gray-900">Welcome to BuySmart</h3>
+              <p className="text-gray-700 mb-6 text-base">
+                Search for any product to compare deals across top platforms and save big!
               </p>
               <button
                 onClick={toggleHelp}
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-2 rounded-lg hover:shadow-[0_0_10px_rgba(79,70,229,0.5)] transition-shadow duration-200"
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg hover:shadow-[0_0_15px_rgba(79,70,229,0.6)] transition-all duration-300"
               >
                 Got It
               </button>
@@ -358,40 +400,43 @@ const HomePage = () => {
         )}
 
         {/* Hero Section */}
-        <section className="relative z-10 bg-white py-16 sm:py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 leading-tight tracking-tight animate-fade-in">
-              Discover the Best Deals with <span className="text-blue-600">BuySmart</span>
+        <section className="relative z-10 bg-gradient-to-b from-white to-gray-100 py-20 sm:py-28">
+          <div className="container mx-auto px-6 text-center">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight animate-pulse-text">
+              Find <span className="text-blue-600">Unbeatable Deals</span> with BuySmart
             </h1>
-            <p className="text-base sm:text-lg text-gray-600 mb-6 max-w-3xl mx-auto">
-              Find unbeatable offers across top platforms in seconds.
+            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto animate-fade-in">
+              Compare prices across top platforms and save big on every purchase.
             </p>
             <form
               onSubmit={handleCompare}
-              className="max-w-md sm:max-w-lg mx-auto flex flex-col sm:flex-row gap-3"
+              className="max-w-xl mx-auto flex items-center gap-3 bg-white/30 backdrop-blur-lg p-3 rounded-xl shadow-lg"
             >
-              <input
-                type="text"
-                value={compareQuery}
-                onChange={(e) => setCompareQuery(e.target.value)}
-                placeholder="Search for phones, laptops, or anything..."
-                className="flex-grow p-3 rounded-lg bg-gray-100 text-gray-800 outline-none focus:ring-2 focus:ring-blue-600 transition-shadow duration-200 text-sm"
-                required
-              />
+              <div className="relative flex-grow">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
+                <input
+                  type="text"
+                  value={compareQuery}
+                  onChange={(e) => setCompareQuery(e.target.value)}
+                  placeholder="Search for phones, laptops, or anything..."
+                  className="w-full pl-10 pr-4 py-3 rounded-lg bg-transparent text-gray-800 outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300"
+                  required
+                />
+              </div>
               <button
                 type="submit"
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-3 rounded-lg font-semibold hover:scale-105 hover:shadow-[0_0_15px_rgba(79,70,229,0.5)] transition-transform duration-200 text-sm"
+                className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:scale-105 hover:shadow-[0_0_15px_rgba(79,70,229,0.6)] transition-all duration-300"
               >
-                Find Deals
+                Search
               </button>
             </form>
-            <div className="mt-8">
+            <div className="mt-12">
               <Image
                 src="https://images.pexels.com/photos/5632371/pexels-photo-5632371.jpeg"
-                alt="Online shopping interface with product deals"
+                alt="Online shopping interface"
                 width={1200}
                 height={600}
-                className="rounded-xl shadow-lg mx-auto object-cover w-full max-w-4xl"
+                className="rounded-2xl shadow-2xl mx-auto object-cover w-full max-w-5xl animate-fade-in"
                 loading="eager"
                 priority
                 onError={(e) => (e.target.src = 'https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg')}
@@ -401,20 +446,20 @@ const HomePage = () => {
         </section>
 
         {/* How It Works Section */}
-        <section className="relative z-10 bg-gray-100 py-16 sm:py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 text-gray-800">
+        <section className="relative z-10 bg-gray-50 py-20 sm:py-28">
+          <div className="container mx-auto px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-900 animate-pulse-text">
               How BuySmart Works
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {howItWorks.map((step, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-200"
+                  className="bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                 >
-                  <div className="text-4xl mb-4">{step.icon}</div>
-                  <h3 className="text-lg font-semibold mb-2 text-gray-800">{step.step}</h3>
-                  <p className="text-gray-600 text-sm">{step.description}</p>
+                  <div className="text-5xl mb-6">{step.icon}</div>
+                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{step.step}</h3>
+                  <p className="text-gray-600">{step.description}</p>
                 </div>
               ))}
             </div>
@@ -422,23 +467,23 @@ const HomePage = () => {
         </section>
 
         {/* Platforms Section */}
-        <section className="relative z-10 bg-white py-16 sm:py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 text-gray-800">
-              Shop on Trusted Platforms
+        <section className="relative z-10 bg-white py-20 sm:py-28">
+          <div className="container mx-auto px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-900 animate-pulse-text">
+              Trusted Platforms
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
               {platforms.map((platform) => (
                 <div
                   key={platform.name}
-                  className="bg-gray-100 rounded-lg p-4 flex items-center justify-center shadow-md hover:shadow-lg transition-shadow duration-200"
+                  className="bg-gray-50 rounded-xl p-6 flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                 >
                   <Image
                     src={platform.src}
                     alt={`${platform.name} logo`}
                     width={120}
                     height={60}
-                    className="object-contain w-full h-10"
+                    className="object-contain w-full h-12"
                     loading="lazy"
                     onError={(e) => (e.target.src = 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg')}
                   />
@@ -449,35 +494,35 @@ const HomePage = () => {
         </section>
 
         {/* Top Deals Section */}
-        <section className="relative z-10 bg-gray-100 py-16 sm:py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 text-gray-800">
+        <section className="relative z-10 bg-gray-50 py-20 sm:py-28">
+          <div className="container mx-auto px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-900 animate-pulse-text">
               Today’s Top Deals
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {topDeals.map((deal, index) => (
                 <a
                   key={index}
                   href={deal.link}
-                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
+                  className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300"
                 >
                   <Image
                     src={deal.image}
                     alt={`${deal.name} on ${deal.platform}`}
                     width={400}
                     height={200}
-                    className="w-full h-40 object-cover"
+                    className="w-full h-48 object-cover"
                     loading="lazy"
                     onError={(e) => (e.target.src = 'https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg')}
                   />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800">{deal.name}</h3>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900">{deal.name}</h3>
                     <p className="text-sm text-gray-600">
                       <span className="line-through">{deal.originalPrice}</span>{' '}
                       <span className="text-blue-600 font-semibold">{deal.discountedPrice}</span>
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">Available on {deal.platform}</p>
-                    <button className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200">
+                    <p className="text-sm text-gray-500 mt-2">Available on {deal.platform}</p>
+                    <button className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300">
                       View Deal
                     </button>
                   </div>
@@ -488,35 +533,35 @@ const HomePage = () => {
         </section>
 
         {/* Trending Products Section */}
-        <section className="relative z-10 bg-white py-16 sm:py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 text-gray-800">
+        <section className="relative z-10 bg-white py-20 sm:py-28">
+          <div className="container mx-auto px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-900 animate-pulse-text">
               Trending Products
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
               {trendingProducts.map((product, index) => (
                 <a
                   key={index}
                   href={product.link}
-                  className="bg-gray-100 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200"
+                  className="bg-gray-50 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300"
                 >
                   <Image
                     src={product.image}
                     alt={`${product.name} on ${product.platform}`}
                     width={400}
                     height={200}
-                    className="w-full h-40 object-cover"
+                    className="w-full h-48 object-cover"
                     loading="lazy"
                     onError={(e) => (e.target.src = 'https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg')}
                   />
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900">{product.name}</h3>
                     <p className="text-sm text-gray-600">
                       <span className="line-through">{product.originalPrice}</span>{' '}
                       <span className="text-blue-600 font-semibold">{product.discountedPrice}</span>
                     </p>
-                    <p className="text-sm text-gray-500 mt-1">Available on {product.platform}</p>
-                    <button className="mt-3 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors duration-200">
+                    <p className="text-sm text-gray-500 mt-2">Available on {product.platform}</p>
+                    <button className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-all duration-300">
                       View Deal
                     </button>
                   </div>
@@ -527,16 +572,16 @@ const HomePage = () => {
         </section>
 
         {/* Testimonials Section */}
-        <section className="relative z-10 bg-gray-100 py-16 sm:py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 text-gray-800">
+        <section className="relative z-10 bg-gray-50 py-20 sm:py-28">
+          <div className="container mx-auto px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-900 animate-pulse-text">
               Loved by Our Users
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow duration-200"
+                  className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
                 >
                   <div className="flex items-center mb-4">
                     <Image
@@ -549,10 +594,10 @@ const HomePage = () => {
                       onError={(e) => (e.target.src = 'https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg')}
                     />
                     <div>
-                      <p className="font-semibold text-sm text-gray-800">{testimonial.author}</p>
+                      <p className="font-semibold text-gray-900">{testimonial.author}</p>
                     </div>
                   </div>
-                  <p className="text-gray-600 italic text-sm">"{testimonial.quote}"</p>
+                  <p className="text-gray-600 italic">"{testimonial.quote}"</p>
                 </div>
               ))}
             </div>
@@ -560,19 +605,19 @@ const HomePage = () => {
         </section>
 
         {/* FAQ Section */}
-        <section className="relative z-10 bg-white py-16 sm:py-20">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-10 text-gray-800">
+        <section className="relative z-10 bg-white py-20 sm:py-28">
+          <div className="container mx-auto px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center mb-12 text-gray-900 animate-pulse-text">
               Frequently Asked Questions
             </h2>
-            <div className="max-w-3xl mx-auto space-y-4">
+            <div className="max-w-3xl mx-auto space-y-6">
               {faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className="bg-gray-100 rounded-xl p-4 shadow-md hover:shadow-lg transition-shadow duration-200"
+                  className="bg-gray-50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300"
                 >
-                  <h3 className="text-lg font-semibold mb-2 text-gray-800">{faq.question}</h3>
-                  <p className="text-gray-600 text-sm">{faq.answer}</p>
+                  <h3 className="text-lg font-semibold mb-3 text-gray-900">{faq.question}</h3>
+                  <p className="text-gray-600">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -580,29 +625,29 @@ const HomePage = () => {
         </section>
 
         {/* Newsletter Signup Section */}
-        <section className="relative z-10 bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16 sm:py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+        <section className="relative z-10 bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-20 sm:py-28">
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6 animate-pulse-text">
               Stay Updated with BuySmart
             </h2>
-            <p className="text-base sm:text-lg mb-6 max-w-2xl mx-auto">
-              Subscribe for the latest deals and shopping tips.
+            <p className="text-lg sm:text-xl mb-8 max-w-2xl mx-auto animate-fade-in">
+              Subscribe for exclusive deals and shopping tips.
             </p>
             <form
               onSubmit={handleNewsletterSignup}
-              className="max-w-md sm:max-w-lg mx-auto flex flex-col sm:flex-row gap-3"
+              className="max-w-xl mx-auto flex items-center gap-3 bg-white/30 backdrop-blur-lg p-3 rounded-xl shadow-lg"
             >
               <input
                 type="email"
                 value={newsletterEmail}
                 onChange={(e) => setNewsletterEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="flex-grow p-3 rounded-lg bg-white/90 text-gray-800 outline-none focus:ring-2 focus:ring-blue-600 transition-shadow duration-200 text-sm"
+                className="flex-grow p-3 rounded-lg bg-transparent text-white placeholder-white/70 outline-none focus:ring-2 focus:ring-white transition-all duration-300"
                 required
               />
               <button
                 type="submit"
-                className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-transform duration-200 text-sm"
+                className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.4)] transition-all duration-300"
               >
                 Subscribe
               </button>
@@ -611,31 +656,31 @@ const HomePage = () => {
         </section>
 
         {/* CTA Section */}
-        <section className="relative z-10 bg-gray-900 text-white py-16 sm:py-20">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-              Find the Best Deals Today
+        <section className="relative z-10 bg-gray-900 text-white py-20 sm:py-28">
+          <div className="container mx-auto px-6 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-6 animate-pulse-text">
+              Start Saving Today
             </h2>
-            <p className="text-base sm:text-lg mb-6 max-w-2xl mx-auto">
-              Shop smarter with BuySmart’s curated offers.
+            <p className="text-lg sm:text-xl mb-8 max-w-2xl mx-auto animate-fade-in">
+              Discover the best deals with BuySmart’s curated offers.
             </p>
             <button
               onClick={() => document.querySelector('input[type="text"]').focus()}
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-6 py-3 rounded-lg font-semibold hover:scale-105 hover:shadow-[0_0_15px_rgba(79,70,229,0.5)] transition-transform duration-200 text-sm"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:scale-105 hover:shadow-[0_0_20px_rgba(79,70,229,0.6)] transition-all duration-300"
             >
-              Search Deals
+              Search Deals Now
             </button>
           </div>
         </section>
 
         {/* Footer */}
-        <section className="relative z-10 bg-gray-800 text-white py-10">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <section className="relative z-10 bg-gray-800 text-white py-12">
+          <div className="container mx-auto px-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
               <div>
                 <h3 className="text-xl font-bold mb-4">BuySmart</h3>
-                <p className="text-gray-400 text-sm">
-                  Discover the best deals across top e-commerce platforms.
+                <p className="text-gray-400">
+                  Your one-stop platform for the best e-commerce deals.
                 </p>
               </div>
               <div>
@@ -645,7 +690,7 @@ const HomePage = () => {
                     <li key={item}>
                       <a
                         href={`/${item.toLowerCase()}`}
-                        className="text-gray-400 hover:text-blue-300 transition-colors duration-200 text-sm"
+                        className="text-gray-400 hover:text-blue-300 transition-colors duration-200"
                       >
                         {item}
                       </a>
@@ -660,7 +705,7 @@ const HomePage = () => {
                     <li key={category}>
                       <a
                         href={`/category/${category.toLowerCase().replace(' & ', '-')}`}
-                        className="text-gray-400 hover:text-blue-300 transition-colors duration-200 text-sm"
+                        className="text-gray-400 hover:text-blue-300 transition-colors duration-200"
                       >
                         {category}
                       </a>
@@ -675,7 +720,7 @@ const HomePage = () => {
                     <li key={item}>
                       <a
                         href={`/${item.toLowerCase().replace(' ', '-')}`}
-                        className="text-gray-400 hover:text-blue-300 transition-colors duration-200 text-sm"
+                        className="text-gray-400 hover:text-blue-300 transition-colors duration-200"
                       >
                         {item}
                       </a>
@@ -684,20 +729,33 @@ const HomePage = () => {
                 </ul>
               </div>
             </div>
-            <p className="text-center text-gray-400 mt-6 text-sm">
-              © 2025 BuySmart. All rights reserved.
-            </p>
+            <p className="text-center text-gray-400 mt-8">© 2025 BuySmart. All rights reserved.</p>
           </div>
         </section>
 
         {/* Inline CSS for Animations */}
         <style jsx global>{`
           @keyframes fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          @keyframes pulse-text {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+          }
+          @keyframes slide-in {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
           }
           .animate-fade-in {
-            animation: fade-in 0.6s ease-out forwards;
+            animation: fade-in 0.8s ease-out forwards;
+          }
+          .animate-pulse-text {
+            animation: pulse-text 2s infinite ease-in-out;
+          }
+          .animate-slide-in {
+            animation: slide-in 0.5s ease-out forwards;
           }
         `}</style>
       </div>

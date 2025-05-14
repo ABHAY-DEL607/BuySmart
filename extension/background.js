@@ -105,9 +105,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.action === "comparePrices") {
-        const { productName, site } = message.data;
-        fetchPricesFromOtherSites(productName, site).then(prices => {
-            sendResponse({ prices });
+        isAuthenticated().then(authenticated => {
+            if (!authenticated) {
+                sendResponse({ error: "User not authenticated" });
+                return;
+            }
+            const { productName, site } = message.data;
+            fetchPricesFromOtherSites(productName, site).then(prices => {
+                sendResponse({ prices });
+            });
         });
         return true;
     }
@@ -124,3 +130,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     return true; // Keeps the message port open for async responses
 });
+
+// Add this function to your existing background.js
+function isAuthenticated() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(['token'], (result) => {
+            resolve(!!result.token);
+        });
+    });
+}

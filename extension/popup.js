@@ -1,17 +1,49 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Get DOM elements
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
     const authSection = document.getElementById("authSection");
     const priceSection = document.getElementById("priceSection");
-    const authMessage = document.getElementById("authMessage");
-    const loginButton = document.getElementById("loginButton");
-    const registerButton = document.getElementById("registerButton");
-    const logoutButton = document.getElementById("logoutButton");
+
+    // Login form elements
     const usernameInput = document.getElementById("username");
     const passwordInput = document.getElementById("password");
+    const loginButton = document.getElementById("loginButton");
+    const authMessage = document.getElementById("authMessage");
+
+    // Register form elements
+    const regUsernameInput = document.getElementById("regUsername");
+    const regPasswordInput = document.getElementById("regPassword");
+    const confirmPasswordInput = document.getElementById("confirmPassword");
+    const registerButton = document.getElementById("registerButton");
+    const regAuthMessage = document.getElementById("regAuthMessage");
+
+    // Other elements
+    const logoutButton = document.getElementById("logoutButton");
     const pricesElement = document.getElementById("prices");
     const statusElement = document.getElementById("status");
     const saveButton = document.getElementById("saveButton");
 
     const API_URL = "http://localhost:5000";
+
+    // Tab switching functionality
+    loginTab.addEventListener("click", () => {
+        loginTab.classList.add("active");
+        registerTab.classList.remove("active");
+        loginForm.classList.remove("hidden");
+        registerForm.classList.add("hidden");
+        clearMessages();
+    });
+
+    registerTab.addEventListener("click", () => {
+        registerTab.classList.add("active");
+        loginTab.classList.remove("active");
+        registerForm.classList.remove("hidden");
+        loginForm.classList.add("hidden");
+        clearMessages();
+    });
 
     // Check if the user is already logged in
     const token = localStorage.getItem("token");
@@ -22,20 +54,23 @@ document.addEventListener("DOMContentLoaded", function () {
         loadPriceComparison();
     }
 
-    // Login User
+    // Login functionality
     loginButton.addEventListener("click", async () => {
-        const username = usernameInput.value;
-        const password = passwordInput.value;
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
 
-        if (!username || !password) {
-            authMessage.innerText = "Please enter both username and password";
+        if (!validateInput(username, password)) {
+            showMessage(authMessage, "Please enter both username and password", "error");
             return;
         }
 
         try {
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
                 body: JSON.stringify({ username, password })
             });
 
@@ -45,34 +80,33 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error(data.message || "Login failed");
             }
 
-            if (data.token) {
-                localStorage.setItem("token", data.token);
-                authSection.classList.add("hidden");
-                priceSection.classList.remove("hidden");
-                logoutButton.classList.remove("hidden");
-                authMessage.innerText = "";
-                loadPriceComparison();
-            }
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("username", username);
+            showAuthSuccess();
+            loadPriceComparison();
         } catch (err) {
-            authMessage.innerText = err.message || "Login failed. Please try again.";
+            showMessage(authMessage, err.message || "Login failed. Please try again.", "error");
             console.error("Login error:", err);
         }
     });
 
-    // Register User
+    // Register functionality
     registerButton.addEventListener("click", async () => {
-        const username = usernameInput.value;
-        const password = passwordInput.value;
+        const username = regUsernameInput.value.trim();
+        const password = regPasswordInput.value.trim();
+        const confirmPassword = confirmPasswordInput.value.trim();
 
-        if (!username || !password) {
-            authMessage.innerText = "Please enter both username and password";
+        if (!validateRegistration(username, password, confirmPassword)) {
             return;
         }
 
         try {
             const response = await fetch(`${API_URL}/auth/register`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
                 body: JSON.stringify({ username, password })
             });
 
@@ -82,11 +116,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 throw new Error(data.message || "Registration failed");
             }
 
-            authMessage.innerText = "Registration successful! Please login.";
-            usernameInput.value = "";
-            passwordInput.value = "";
+            showMessage(regAuthMessage, "Registration successful! Please login.", "success");
+            clearRegistrationForm();
+            
+            // Switch to login tab
+            setTimeout(() => {
+                loginTab.click();
+            }, 1500);
         } catch (err) {
-            authMessage.innerText = err.message || "Registration failed. Please try again.";
+            showMessage(regAuthMessage, err.message || "Registration failed. Please try again.", "error");
             console.error("Registration error:", err);
         }
     });
@@ -94,12 +132,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Logout User
     logoutButton.addEventListener("click", () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("username");
         authSection.classList.remove("hidden");
         priceSection.classList.add("hidden");
         logoutButton.classList.add("hidden");
-        authMessage.innerText = "";
-        usernameInput.value = "";
-        passwordInput.value = "";
+        clearMessages();
+        loginTab.click();
     });
 
     // Load price comparison data
@@ -151,4 +189,64 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     }
+
+    // Helper functions
+    function validateInput(username, password) {
+        return username.length > 0 && password.length > 0;
+    }
+
+    function validateRegistration(username, password, confirmPassword) {
+        if (!validateInput(username, password)) {
+            showMessage(regAuthMessage, "Please fill in all fields", "error");
+            return false;
+        }
+
+        if (password.length < 6) {
+            showMessage(regAuthMessage, "Password must be at least 6 characters", "error");
+            return false;
+        }
+
+        if (password !== confirmPassword) {
+            showMessage(regAuthMessage, "Passwords do not match", "error");
+            return false;
+        }
+
+        return true;
+    }
+
+    function showMessage(element, message, type) {
+        element.textContent = message;
+        element.className = type;
+        element.classList.remove("hidden");
+    }
+
+    function clearMessages() {
+        authMessage.className = "hidden";
+        regAuthMessage.className = "hidden";
+    }
+
+    function clearRegistrationForm() {
+        regUsernameInput.value = "";
+        regPasswordInput.value = "";
+        confirmPasswordInput.value = "";
+    }
+
+    function showAuthSuccess() {
+        authSection.classList.add("hidden");
+        priceSection.classList.remove("hidden");
+        clearMessages();
+    }
+
+    // Check authentication status on popup open
+    function checkAuthStatus() {
+        const token = localStorage.getItem("token");
+        if (token) {
+            showAuthSuccess();
+            return true;
+        }
+        return false;
+    }
+
+    // Initialize authentication check
+    checkAuthStatus();
 });
