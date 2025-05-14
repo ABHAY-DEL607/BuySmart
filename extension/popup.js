@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const registerForm = document.getElementById("registerForm");
     const authSection = document.getElementById("authSection");
     const priceSection = document.getElementById("priceSection");
+<<<<<<< HEAD
 
     // Login form elements
     const usernameInput = document.getElementById("username");
@@ -21,13 +22,47 @@ document.addEventListener("DOMContentLoaded", function () {
     const regAuthMessage = document.getElementById("regAuthMessage");
 
     // Other elements
+=======
+    const authMessage = document.getElementById("authMessage");
+    const loginButton = document.getElementById("loginButton");
+    const registerButton = document.getElementById("registerButton");
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
     const logoutButton = document.getElementById("logoutButton");
     const pricesElement = document.getElementById("prices");
     const statusElement = document.getElementById("status");
     const saveButton = document.getElementById("saveButton");
+    const smartTipElement = document.getElementById("smartTip");
 
-    const API_URL = "http://localhost:5000";
+    const API_URL = "http://localhost:5000"; // Update to your production API URL, e.g., "https://api.buysmart.com"
+    const WEBSITE_URL = "http://localhost:3000"; // Update to your production website URL, e.g., "https://buysmart.com"
 
+    const smartTips = [
+        "Smart Tip: Compare prices across multiple sites!",
+        "Smart Tip: Check reviews before buying!",
+        "Smart Tip: Look for coupon codes!",
+        "Smart Tip: Save more with bulk purchases!",
+        "Smart Tip: Check for No Cost EMI on Flipkart!",
+        "Smart Tip: Look for Authenticity Guarantee on eBay!"
+    ];
+
+    function rotateSmartTip() {
+        let index = 0;
+        smartTipElement.textContent = smartTips[index];
+        setInterval(() => {
+            index = (index + 1) % smartTips.length;
+            smartTipElement.textContent = smartTips[index];
+        }, 5000);
+    }
+
+    if (!window.chrome || !chrome.runtime) {
+        statusElement.innerText = "Please enable JavaScript in your browser to use this extension.";
+        authSection.classList.add("hidden");
+        priceSection.classList.remove("hidden");
+        smartTipElement.classList.add("hidden");
+        return;
+    }
+
+<<<<<<< HEAD
     // Tab switching functionality
     loginTab.addEventListener("click", () => {
         loginTab.classList.add("active");
@@ -46,14 +81,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Check if the user is already logged in
+=======
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
     const token = localStorage.getItem("token");
     if (token) {
         authSection.classList.add("hidden");
         priceSection.classList.remove("hidden");
         logoutButton.classList.remove("hidden");
+        smartTipElement.classList.add("hidden");
         loadPriceComparison();
+    } else {
+        rotateSmartTip();
     }
 
+<<<<<<< HEAD
     // Login functionality
     loginButton.addEventListener("click", async () => {
         const username = usernameInput.value.trim();
@@ -127,20 +168,36 @@ document.addEventListener("DOMContentLoaded", function () {
             showMessage(regAuthMessage, err.message || "Registration failed. Please try again.", "error");
             console.error("Registration error:", err);
         }
+=======
+    loginButton.addEventListener("click", () => {
+        console.log('Login button clicked, redirecting to:', `${WEBSITE_URL}/login`);
+        localStorage.setItem('return_to_extension', 'true');
+        chrome.tabs.create({ url: `${WEBSITE_URL}/login` });
     });
 
-    // Logout User
+    registerButton.addEventListener("click", () => {
+        console.log('Register button clicked, redirecting to:', `${WEBSITE_URL}/signup`);
+        localStorage.setItem('return_to_extension', 'true');
+        chrome.tabs.create({ url: `${WEBSITE_URL}/signup` });
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
+    });
+
     logoutButton.addEventListener("click", () => {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
         authSection.classList.remove("hidden");
         priceSection.classList.add("hidden");
         logoutButton.classList.add("hidden");
+<<<<<<< HEAD
         clearMessages();
         loginTab.click();
+=======
+        smartTipElement.classList.remove("hidden");
+        authMessage.innerText = "";
+        rotateSmartTip();
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
     });
 
-    // Load price comparison data
     async function loadPriceComparison() {
         chrome.runtime.sendMessage({ action: "getProductData" }, (response) => {
             if (!response || !response.data) {
@@ -148,12 +205,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            const { productName, productPrice, site } = response.data;
-            pricesElement.innerHTML = `
+            const { productName, productPrice, site, discount, specialOffer } = response.data;
+            let priceHTML = `
                 <h3>${productName}</h3>
                 <p><strong>${site} Price:</strong> ${productPrice}</p>
-                <p><strong>Comparing Prices...</strong></p>
             `;
+
+            if (discount) {
+                priceHTML += `<p><strong>Discount:</strong> ${discount}</p>`;
+            }
+            if (specialOffer) {
+                priceHTML += `<p><strong>Special Offer:</strong> ${specialOffer}</p>`;
+            }
+
+            if (site.toLowerCase().includes("flipkart")) {
+                priceHTML += `<p><em>Eligible for Flipkart Plus benefits and No Cost EMI!</em></p>`;
+            } else if (site.toLowerCase().includes("ebay")) {
+                priceHTML += `<p><em>Comes with eBay Authenticity Guarantee!</em></p>`;
+            }
+
+            priceHTML += `<p><strong>Comparing Prices...</strong></p>`;
+            pricesElement.innerHTML = priceHTML;
 
             chrome.runtime.sendMessage({ action: "comparePrices", data: { productName, site } }, (comparisonResponse) => {
                 if (!comparisonResponse || !comparisonResponse.prices) {
@@ -161,7 +233,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                let comparisons = comparisonResponse.prices.map(({ site, price }) => `<p><strong>${site}:</strong> ${price}</p>`).join("");
+                let comparisons = comparisonResponse.prices.map(({ site, price }) => {
+                    return `<p><strong>${site}:</strong> ${price}</p>`;
+                }).join("");
                 pricesElement.innerHTML += comparisons;
                 saveButton.classList.remove("hidden");
 
@@ -190,6 +264,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+<<<<<<< HEAD
     // Helper functions
     function validateInput(username, password) {
         return username.length > 0 && password.length > 0;
@@ -250,3 +325,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize authentication check
     checkAuthStatus();
 });
+=======
+    chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
+        if (request.type === 'LOGIN_SUCCESS' || request.type === 'SIGNUP_SUCCESS') {
+            localStorage.setItem('token', request.token);
+            authSection.classList.add("hidden");
+            priceSection.classList.remove("hidden");
+            logoutButton.classList.remove("hidden");
+            smartTipElement.classList.add("hidden");
+            loadPriceComparison();
+        }
+    });
+});
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa

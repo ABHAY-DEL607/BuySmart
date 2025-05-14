@@ -1,18 +1,27 @@
 {
     "manifest_version": 3,
-    "name": "Price Compass--2",
-    "version": "2.0",
+    "name": "BuySmart (Search,Compare,Save)",
+    "version": "1.0",
     "description": "Compare product prices across different Indian e-commerce sites",
-    "permissions": ["storage", "activeTab", "scripting", "tabs", "webNavigation"],
-
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "tabs",
+        "webNavigation"
+    ],
     "host_permissions": [
         "https://www.amazon.in/*",
         "https://www.flipkart.com/*",
-        "https://paytmmall.com/*",
-        "https://www.ebay.com/*",
+        "https://www.paytmmall.com/*",
         "https://www.jiomart.com/*",
-        "http://localhost:5000/*"
+        "https://www.ebay.com/*",
+        "http://localhost:5000/*",
+        "http://localhost:3000/*"
     ],
+    "externally_connectable": {
+        "matches": ["http://localhost:3000/*"]
+    },
     "background": {
         "service_worker": "background.js"
     },
@@ -21,9 +30,9 @@
             "matches": [
                 "https://www.amazon.in/*",
                 "https://www.flipkart.com/*",
-                "https://paytmmall.com/*",
-                "https://www.ebay.com/*",
-                "https://www.jiomart.com/*"
+                "https://www.paytmmall.com/*",
+                "https://www.jiomart.com/*",
+                "https://www.ebay.com/*"
             ],
             "js": ["content.js"]
         }
