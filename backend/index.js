@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const { connectDB } = require('./connection');
+const mongoose = require('mongoose');
 
 // Import all routers
 const authRoutes = require('./Routes/authRoutes');
@@ -15,7 +16,7 @@ const platformRoutes = require('./Routes/platformRoutes');
 const sharingRoutes = require('./Routes/SharingRoutes');
 
 const app = express();
-const port = 5000;
+const PORT = process.env.PORT || 5001;
 
 // Security middleware - disable for local development to avoid CORS issues
 // app.use(helmet());
@@ -47,6 +48,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Connect to Database
 connectDB();
+
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // API Routes
 app.use('/auth', authRoutes);
@@ -90,9 +95,9 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-    console.log(`Test endpoint: http://localhost:${port}/test`);
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+    console.log(`Test endpoint: http://localhost:${PORT}/test`);
 });
 
 // Handle unhandled promise rejections

@@ -2,105 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-<<<<<<< HEAD
-    <title>Price Compass</title>
-    <style>
-        body {
-            width: 350px;
-            padding: 15px;
-            font-family: Arial, sans-serif;
-            margin: 0;
-        }
-        .container {
-            padding: 15px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        .form-group input {
-            width: calc(100% - 20px);
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            margin: 5px 0;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-        .btn:hover {
-            background-color: #45a049;
-        }
-        .btn.secondary {
-            background-color: #2196F3;
-        }
-        .btn.secondary:hover {
-            background-color: #1976D2;
-        }
-        .btn.danger {
-            background-color: #f44336;
-        }
-        .btn.danger:hover {
-            background-color: #d32f2f;
-        }
-        .hidden {
-            display: none;
-        }
-        #authMessage {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        #authMessage.error {
-            background-color: #ffebee;
-            color: #c62828;
-            border: 1px solid #ffcdd2;
-        }
-        #authMessage.success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #c8e6c9;
-        }
-        .tab-container {
-            display: flex;
-            margin-bottom: 20px;
-        }
-        .tab {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            background: #f5f5f5;
-            border-bottom: 2px solid transparent;
-        }
-        .tab.active {
-            background: #fff;
-            border-bottom: 2px solid #4CAF50;
-=======
     <title>BuySmart: Shop Savvy</title>
     <script src="popup.js" defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #3b82f6;
             --secondary-color: #6366f1;
             --text-dark: #f8fafc;
             --bg-gradient: linear-gradient(135deg, #181c2f 0%, #232946 60%, #3b82f6 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --hover-bg: rgba(255, 255, 255, 0.1);
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
         }
 
         body {
@@ -114,12 +30,24 @@
             position: relative;
             overflow: hidden;
             perspective: 1000px;
+            min-width: 380px;
+            min-height: 500px;
+        }
+
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
 
         #popup-container {
-            width: 340px;
-            max-width: 340px;
-            min-width: 340px;
+            width: 380px;
+            max-width: 380px;
+            min-width: 380px;
             padding: 25px;
             box-sizing: border-box;
             height: auto;
@@ -131,49 +59,84 @@
             filter: brightness(1.1) blur(0.2px);
             position: relative;
             overflow-x: hidden;
-            overflow-y: hidden;
+            overflow-y: auto;
             z-index: 1;
+        }
+
+        .title-container {
+            position: relative;
+            margin: 20px 0;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .title-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
         }
 
         h2 {
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 2em;
+            font-size: 2.5em;
             font-weight: 800;
-            text-align: center;
-            margin: 18px 0 10px 0;
+            margin: 0;
             color: var(--text-dark);
             letter-spacing: 1px;
-            z-index: 2;
-            text-shadow: 0 0 12px #3b82f6, 0 2px 16px #232946, 0 0 8px #fff2;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
         }
+
         h2 .buysmart-gradient {
-            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: linear-gradient(90deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             text-fill-color: transparent;
             font-weight: 800;
-            text-shadow: 0 0 18px #3b82f6, 0 2px 16px #232946, 0 0 8px #fff2;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2 .buysmart-gradient::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6 0%, #6366f1 50%, #8b5cf6 100%);
+            border-radius: 2px;
+            transform: scaleX(0.8);
+            opacity: 0.8;
         }
 
         #status {
             font-style: italic;
-            color: #6b7280;
+            color: #94a3b8;
             text-align: center;
             font-size: 16px;
             z-index: 1;
+            margin-bottom: 20px;
         }
 
         button {
-            padding: 12px;
-            margin: 10px 0;
+            padding: 14px;
+            margin: 12px 0;
             cursor: pointer;
             width: 100%;
             background: linear-gradient(135deg, var(--primary-color), #2563eb);
             border: none;
             color: #fff;
             font-family: 'Poppins', Arial, sans-serif;
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: 600;
             border-radius: 12px;
             transition: all 0.3s ease;
             position: relative;
@@ -187,8 +150,8 @@
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
 
-        button::after {
-            display: none !important;
+        button:active {
+            transform: translateY(0) scale(0.98);
         }
 
         .hidden {
@@ -196,18 +159,18 @@
         }
 
         #authMessage {
-            color: #6b7280;
+            color: #94a3b8;
             text-align: center;
             font-size: 16px;
-            margin: 5px 0;
+            margin: 8px 0;
             z-index: 1;
         }
 
         #logo {
             display: block;
-            margin: 0 auto 10px;
-            width: 50px;
-            height: 50px;
+            margin: 0 auto 15px;
+            width: 60px;
+            height: 60px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%233b82f6"><path d="M21 6h-4.5c0-2.76-2.24-5-5-5S6.5 3.24 6.5 6H2v15c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-9.5-3c1.66 0 3 1.34 3 3h-6c0-1.66 1.34-3 3-3zm8.5 18H4V8h16v13z"/></svg>') no-repeat center;
             background-size: contain;
             z-index: 1;
@@ -216,47 +179,296 @@
         }
 
         #logo:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(5deg);
         }
 
         #smartTip {
             font-size: 15px;
             color: #fff;
             text-align: center;
-            margin: 10px 0;
+            margin: 15px 0;
             padding: 15px;
             background: rgba(16, 185, 129, 0.18);
             border-radius: 12px;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
             animation: pulseTip 2s infinite ease-in-out;
             text-shadow: 0 0 10px #10b981, 0 2px 8px #232946, 0 0 4px #fff2;
         }
 
         #prices {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--card-bg);
             border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
+            padding: 20px;
+            margin: 15px 0;
             backdrop-filter: blur(5px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--card-border);
         }
 
-        #prices h3 {
+        .product-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .product-header h3 {
             color: #fff;
             margin: 0 0 10px 0;
             font-size: 18px;
+            font-weight: 600;
         }
 
-        #prices p {
-            color: rgba(255, 255, 255, 0.9);
-            margin: 5px 0;
+        .current-price {
+            color: var(--primary-color);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .discount-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 10px 0;
             font-size: 14px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .special-offer {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .benefit-tag {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--primary-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .comparison-header {
+            margin: 20px 0 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .comparison-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .price-comparison {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .price-comparison:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .site-name {
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .price-value {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            text-align: center;
+            padding: 10px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 14px;
+            margin: 12px 0;
+            border: none;
+            border-radius: 12px;
+            background: var(--card-bg);
+            color: #fff;
+            font-size: 16px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        #searchInput::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        #searchInput:focus {
+            outline: none;
+            background: var(--hover-bg);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        #searchResults {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        #searchResults::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #searchResults::-webkit-scrollbar-track {
+            background: var(--card-bg);
+            border-radius: 3px;
+        }
+
+        #searchResults::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .result-item {
+            display: flex;
+            gap: 15px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--card-border);
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            background: var(--hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .result-item:hover .product-image img {
+            transform: scale(1.1);
+        }
+
+        .product-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .product-details h3 {
+            color: #fff;
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .price {
+            color: var(--primary-color);
+            font-size: 15px;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+
+        .discount {
+            color: var(--success-color);
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        .rating {
+            color: var(--warning-color);
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        .site-button {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-top: 8px;
+            background: linear-gradient(135deg, var(--primary-color), #2563eb);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .site-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        #productHistory {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: var(--hover-bg);
+            transform: translateY(-2px);
+        }
+
+        .history-item h3 {
+            color: #fff;
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .history-item p {
+            color: #e2e8f0;
+            margin: 6px 0;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         @keyframes pulseTip {
@@ -265,172 +477,371 @@
             100% { transform: scale(1); }
         }
 
-        #popup-container::-webkit-scrollbar {
-            display: none;
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
         }
 
-        @media (max-width: 400px) {
-            #popup-container { 
-                width: 100%; 
-                padding: 20px; 
-            }
-            h2 { font-size: 20px; }
-            button { font-size: 16px; padding: 10px; }
-            #smartTip { font-size: 12px; padding: 8px; }
-            #logo { width: 40px; height: 40px; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        /* E-commerce themed animated icons */
-        .bg-ecom-icon {
+        .site-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .site-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .site-loading-indicators {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .site-loading {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-loading::before {
+            content: '';
             position: absolute;
-            opacity: 0.18;
-            z-index: -2;
-            pointer-events: none;
-            animation-timing-function: ease-in-out;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: loading-shine 1.5s infinite;
         }
-        .bg-ecom-cart {
-            width: 60px;
-            height: 60px;
-            top: 20px;
-            left: 10px;
-            animation: floatCart 10s infinite alternate;
+
+        .site-loading span {
+            position: relative;
+            z-index: 1;
         }
-        .bg-ecom-bag {
-            width: 50px;
-            height: 50px;
-            bottom: 30px;
-            right: 20px;
-            animation: floatBag 12s infinite alternate-reverse;
+
+        @keyframes loading-shine {
+            100% {
+                left: 100%;
+            }
         }
-        .bg-ecom-tag {
-            width: 40px;
-            height: 40px;
-            top: 80px;
-            right: 60px;
-            animation: floatTag 14s infinite alternate;
+
+        .result-item {
+            position: relative;
+            overflow: hidden;
         }
-        @keyframes floatCart {
-            0% { transform: translateY(0) scale(1) rotate(-10deg); opacity: 0.15; }
-            50% { transform: translateY(18px) scale(1.08) rotate(8deg); opacity: 0.22; }
-            100% { transform: translateY(-10px) scale(1.03) rotate(-5deg); opacity: 0.18; }
+
+        .result-item::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.05),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s;
         }
-        @keyframes floatBag {
-            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0.15; }
-            50% { transform: translateY(-15px) scale(1.1) rotate(10deg); opacity: 0.22; }
-            100% { transform: translateY(10px) scale(0.97) rotate(-8deg); opacity: 0.18; }
+
+        .result-item:hover::after {
+            transform: translateX(100%);
         }
-        @keyframes floatTag {
-            0% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.13; }
-            30% { transform: translate(-8px, 8px) scale(1.1) rotate(10deg); opacity: 0.19; }
-            60% { transform: translate(8px, -8px) scale(0.95) rotate(-10deg); opacity: 0.16; }
-            100% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.13; }
->>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
+
+        .site-button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .site-button:hover::after {
+            transform: translateX(100%);
+        }
+
+        /* Search Results Styles */
+        .site-section {
+            margin: 20px 0;
+            border: 2px solid;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--card-bg);
+            backdrop-filter: blur(5px);
+        }
+
+        .site-header {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .site-icon {
+            font-size: 1.2em;
+        }
+
+        .site-name {
+            font-weight: 600;
+            font-size: 1.1em;
+            color: var(--text-dark);
+        }
+
+        .products-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            background: #fff;
+            padding: 10px;
+        }
+
+        .product-info {
+            padding: 15px;
+        }
+
+        .product-name {
+            font-size: 0.9em;
+            margin: 0 0 10px 0;
+            line-height: 1.4;
+            height: 2.8em;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            color: var(--text-dark);
+        }
+
+        .product-price {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .product-rating {
+            font-size: 0.9em;
+            color: var(--warning-color);
+            margin-bottom: 8px;
+        }
+
+        .product-stock {
+            font-size: 0.9em;
+            margin-bottom: 12px;
+        }
+
+        .in-stock {
+            color: var(--success-color);
+        }
+
+        .out-of-stock {
+            color: var(--error-color);
+        }
+
+        .view-product-btn {
+            display: block;
+            width: 100%;
+            padding: 8px;
+            text-align: center;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: opacity 0.2s;
+        }
+
+        .view-product-btn:hover {
+            opacity: 0.9;
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 15px;
+        }
+
+        .site-loading-indicators {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .site-loading {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            color: var(--text-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .site-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: loading-shine 1.5s infinite;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 20px;
+            color: var(--error-color);
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes loading-shine {
+            100% { left: 100%; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .products-list {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-<<<<<<< HEAD
-    <div class="container">
+    <canvas id="bg-canvas"></canvas>
+    <div id="popup-container">
+        <div id="logo"></div>
+        <div class="title-container">
+            <h2><span class="buysmart-gradient">BuySmart</span></h2>
+        </div>
+        <p id="status">Compare prices across multiple sites</p>
+
+        <!-- Auth Section -->
         <div id="authSection">
-            <div class="tab-container">
-                <div class="tab active" id="loginTab">Login</div>
-                <div class="tab" id="registerTab">Register</div>
-            </div>
-            
-            <div id="loginForm">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter username" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter password" required>
-                </div>
-                <div id="authMessage" class="hidden"></div>
-                <button id="loginButton" class="btn">Login</button>
-            </div>
-
-            <div id="registerForm" class="hidden">
-                <div class="form-group">
-                    <label for="regUsername">Username</label>
-                    <input type="text" id="regUsername" placeholder="Choose username" required>
-                </div>
-                <div class="form-group">
-                    <label for="regPassword">Password</label>
-                    <input type="password" id="regPassword" placeholder="Choose password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" placeholder="Confirm password" required>
-                </div>
-                <div id="regAuthMessage" class="hidden"></div>
-                <button id="registerButton" class="btn">Register</button>
-            </div>
+            <button id="loginButton">Login</button>
+            <button id="registerButton">Register</button>
+            <p id="authMessage"></p>
         </div>
-        
+
+        <!-- Price Comparison Section -->
         <div id="priceSection" class="hidden">
-            <h2>Price Comparison</h2>
+            <form id="searchForm" class="search-form">
+                <input type="text" id="searchInput" placeholder="Search for products..." required>
+                <input type="text" id="productLinkInput" placeholder="Or paste product link">
+                <button type="submit">Search</button>
+            </form>
+
+            <div id="searchResults" class="search-results"></div>
             <div id="prices"></div>
-            <div id="status"></div>
-            <button id="saveButton" class="btn secondary hidden">Save Price History</button>
-            <button id="logoutButton" class="btn danger">Logout</button>
-        </div>
-    </div>
-    <script src="popup.js"></script>
-=======
-  <div id="popup-container">
-    <!-- E-commerce animated SVG icons -->
-    <svg class="bg-ecom-icon bg-ecom-cart" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#3b82f6" opacity="0.12"/><path d="M14 17h20l-2 12H16l-2-12z" stroke="#3b82f6" stroke-width="2" fill="#fff"/><circle cx="19" cy="35" r="2" fill="#3b82f6"/><circle cx="29" cy="35" r="2" fill="#3b82f6"/></svg>
-    <svg class="bg-ecom-icon bg-ecom-bag" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#10b981" opacity="0.12"/><rect x="16" y="18" width="16" height="14" rx="3" stroke="#10b981" stroke-width="2" fill="#fff"/><path d="M19 22v-2a5 5 0 0 1 10 0v2" stroke="#10b981" stroke-width="2"/></svg>
-    <svg class="bg-ecom-icon bg-ecom-tag" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#f59e42" opacity="0.12"/><rect x="16" y="20" width="16" height="8" rx="2" stroke="#f59e42" stroke-width="2" fill="#fff"/><circle cx="20" cy="24" r="1.5" fill="#f59e42"/></svg>
-    <div id="logo" onclick="chrome.tabs.create({ url: 'http://localhost:3000' })"></div>
-    <h2><span class="buysmart-gradient">BuySmart</span>: Shop Savvy</h2>
-    <div id="smartTip" aria-live="polite">Smart Tip: Compare prices across multiple sites!</div>
-    
-    <div id="authSection">
-        <button id="loginButton">Login</button>
-        <button id="registerButton">Register</button>
-        <p id="authMessage"></p>
-    </div>
-    
-    <div id="priceSection" class="hidden">
-        <input type="text" id="searchInput" placeholder="Search for products...">
-        
-        <div class="site-buttons">
-            <button class="site-button" data-site="amazon">
-                <img src="https://www.amazon.com/favicon.ico" alt="Amazon">
-                Amazon
-            </button>
-            <button class="site-button" data-site="flipkart">
-                <img src="https://www.flipkart.com/favicon.ico" alt="Flipkart">
-                Flipkart
-            </button>
-            <button class="site-button" data-site="ebay">
-                <img src="https://www.ebay.com/favicon.ico" alt="eBay">
-                eBay
-            </button>
-            <button class="site-button" data-site="paytmmall">
-                <img src="https://paytmmall.com/favicon.ico" alt="Paytm Mall">
-                Paytm Mall
-            </button>
-            <button class="site-button" data-site="jiomart">
-                <img src="https://www.jiomart.com/favicon.ico" alt="JioMart">
-                JioMart
-            </button>
+            <button id="saveButton" class="hidden">Save Price History</button>
+            <button id="logoutButton" class="hidden">Logout</button>
         </div>
 
-        <div id="searchResults" class="hidden">
-            <!-- Search results will be populated here -->
+        <!-- Smart Tip -->
+        <div id="smartTip">
+            Smart Tip: Compare prices across multiple sites!
         </div>
 
-        <div id="productHistory">
-            <h3>Search History</h3>
-            <!-- Product history will be populated here -->
-        </div>
+        <!-- Product History -->
+        <div id="productHistory"></div>
     </div>
-    
-    <button id="logoutButton" class="hidden">Logout</button>
-  </div>
->>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
 </body>
 </html>

@@ -81,107 +81,39 @@ const Login = () => {
                 console.log('Return to extension flag:', returnToExtension);
                 
                 if (returnToExtension) {
-                    console.log('Detected login from extension - will attempt to communicate back');
-                    localStorage.removeItem('return_to_extension'); // Clean up
-                    
-                    // IMPORTANT: Don't redirect to home when coming from extension
+                    localStorage.removeItem('return_to_extension');
                     setIsLoading(false);
-                    
-                    // Direct localStorage access - most reliable approach for extension <-> website communication
                     try {
-                        // Try to directly set localStorage in the opener (extension) window
-                        if (window.opener && !window.opener.closed) {
-                            console.log('Detected opener window, attempting direct localStorage access');
-                            
-                            try {
-                                // Store token in both windows
-                                localStorage.setItem('token', result.data.token);
-                                window.opener.localStorage.setItem('token', result.data.token);
-                                
-                                toast.success('Login successful! This window will close in 3 seconds.');
-                                setTimeout(() => window.close(), 3000);
-                                return;
-                            } catch (storageErr) {
-                                console.error('Could not access opener localStorage:', storageErr);
-                            }
-                        }
-                        
-                        // Fall back to other methods if direct access fails
-                        console.log('Chrome context check:', {
-                            chromeExists: typeof chrome !== 'undefined',
-                            runtimeExists: typeof chrome !== 'undefined' && !!chrome.runtime,
-                            sendMessageExists: typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.sendMessage,
-                            extensionId: EXTENSION_ID
-                        });
-                        
-                        // Try chrome.runtime.sendMessage
+                        // Try chrome.runtime.sendMessage first
                         if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage && EXTENSION_ID) {
-                            console.log('Sending token to extension via chrome.runtime.sendMessage');
-                            try {
-                                chrome.runtime.sendMessage(EXTENSION_ID, {
-                                    type: 'LOGIN_SUCCESS',
-                                    token: result.data.token
-                                }, response => {
-                                    console.log('Message response:', response);
-                                    // Show a message to close the tab manually if auto-close fails
-                                    toast.success('Login successful! You can now close this tab and return to the extension.');
-                                    // Close this tab after showing the success message
-                                    setTimeout(() => {
-                                        try {
-                                            window.close();
-                                            console.log('Window close attempted');
-                                        } catch (closeErr) {
-                                            console.error('Failed to close window:', closeErr);
-                                        }
-                                    }, 3000);
-                                });
-                            } catch (e) {
-                                console.error('Error sending message to extension:', e);
-                                // Try window.opener as fallback
-                                if (window.opener) {
-                                    window.opener.postMessage({
-                                        type: 'LOGIN_SUCCESS',
-                                        token: result.data.token
-                                    }, '*');
-                                    toast.success('Login successful! You can now close this tab.');
-                                } else {
-                                    // If all communication methods fail, show a manual instruction
-                                    toast.success('Login successful! Please close this tab and return to the extension.');
-                                }
-                            }
-                        } 
-                        // Try postMessage
-                        else if (window.opener) {
-                            console.log('Sending token to extension via window.postMessage');
+                            chrome.runtime.sendMessage(EXTENSION_ID, {
+                                type: 'LOGIN_SUCCESS',
+                                token: result.data.token
+                            }, response => {
+                                setTimeout(() => {
+                                    try { window.close(); } catch (e) {}
+                                }, 2000);
+                            });
+                        } else if (window.opener) {
+                            // Fallback: Use window.opener.postMessage
                             window.opener.postMessage({
                                 type: 'LOGIN_SUCCESS',
                                 token: result.data.token
                             }, '*');
-                            // Show a message to close the tab manually if auto-close fails
-                            toast.success('Login successful! You can now close this tab and return to the extension.');
-                            // Close this tab after showing the success message
                             setTimeout(() => {
-                                try {
-                                    window.close();
-                                    console.log('Window close attempted');
-                                } catch (closeErr) {
-                                    console.error('Failed to close window:', closeErr);
-                                }
-                            }, 3000);
-                        } 
-                        // Display token for manual use
-                        else {
-                            console.log('No method to communicate with extension found');
-                            console.log('Token for manual use:', result.data.token);
-                            toast.success(`Login successful! Please copy this token: ${result.data.token.substring(0, 15)}...`);
+                                try { window.close(); } catch (e) {}
+                            }, 2000);
+                        } else {
+                            // Manual fallback
+                            toast.success('Login successful! Please close this tab and return to the extension.');
                         }
                     } catch (msgError) {
-                        console.error('Failed to communicate with extension:', msgError);
                         toast.success('Login successful! Please close this tab and return to the extension.');
                     }
+                    return;
                 } else {
-                    // Regular website flow - navigate to home page
-                    router.push('/home');
+                    // Regular website flow - navigate to website home page
+                    router.push('/website-home');
                 }
                 // Reset form
                 resetForm();
