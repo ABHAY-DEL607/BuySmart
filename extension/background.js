@@ -111,9 +111,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.action === "comparePrices") {
-        const { productName, site } = message.data;
-        fetchPricesFromOtherSites(productName, site).then(prices => {
-            sendResponse({ prices });
+        isAuthenticated().then(authenticated => {
+            if (!authenticated) {
+                sendResponse({ error: "User not authenticated" });
+                return;
+            }
+            const { productName, site } = message.data;
+            fetchPricesFromOtherSites(productName, site).then(prices => {
+                sendResponse({ prices });
+            });
         });
         return true;
     }
@@ -125,8 +131,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "fetchData") {
         sendResponse({ success: true, data: "Sample Data" });
     }
+<<<<<<< HEAD
+    return true; // Keeps the message port open for async responses
+});
+
+// Add this function to your existing background.js
+function isAuthenticated() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(['token'], (result) => {
+            resolve(!!result.token);
+        });
+    });
+}
+=======
     return true;
 });
+<<<<<<< HEAD
 
 // Listen for messages from website
 chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
@@ -153,3 +173,6 @@ chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => 
     
     return false;
 });
+=======
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
+>>>>>>> 68afcd953c83c0496b1f23f5060313cbea25f1e3

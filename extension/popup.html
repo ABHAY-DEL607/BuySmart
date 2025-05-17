@@ -2,6 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+<<<<<<< HEAD
+    <title>Price Compass</title>
+    <style>
+        body {
+            width: 350px;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .container {
+            padding: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-group input {
+            width: calc(100% - 20px);
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin: 5px 0;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn.secondary {
+            background-color: #2196F3;
+        }
+        .btn.secondary:hover {
+            background-color: #1976D2;
+        }
+        .btn.danger {
+            background-color: #f44336;
+        }
+        .btn.danger:hover {
+            background-color: #d32f2f;
+        }
+        .hidden {
+            display: none;
+        }
+        #authMessage {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        #authMessage.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        #authMessage.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            background: #f5f5f5;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            background: #fff;
+            border-bottom: 2px solid #4CAF50;
+=======
     <title>BuySmart: Shop Savvy</title>
     <script src="popup.js" defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&display=swap" rel="stylesheet">
@@ -234,10 +324,60 @@
             30% { transform: translate(-8px, 8px) scale(1.1) rotate(10deg); opacity: 0.19; }
             60% { transform: translate(8px, -8px) scale(0.95) rotate(-10deg); opacity: 0.16; }
             100% { transform: translate(0,0) scale(1) rotate(0deg); opacity: 0.13; }
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
         }
     </style>
 </head>
 <body>
+<<<<<<< HEAD
+    <div class="container">
+        <div id="authSection">
+            <div class="tab-container">
+                <div class="tab active" id="loginTab">Login</div>
+                <div class="tab" id="registerTab">Register</div>
+            </div>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password" required>
+                </div>
+                <div id="authMessage" class="hidden"></div>
+                <button id="loginButton" class="btn">Login</button>
+            </div>
+
+            <div id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" placeholder="Choose username" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" placeholder="Choose password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm password" required>
+                </div>
+                <div id="regAuthMessage" class="hidden"></div>
+                <button id="registerButton" class="btn">Register</button>
+            </div>
+        </div>
+        
+        <div id="priceSection" class="hidden">
+            <h2>Price Comparison</h2>
+            <div id="prices"></div>
+            <div id="status"></div>
+            <button id="saveButton" class="btn secondary hidden">Save Price History</button>
+            <button id="logoutButton" class="btn danger">Logout</button>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+=======
   <div id="popup-container">
     <!-- E-commerce animated SVG icons -->
     <svg class="bg-ecom-icon bg-ecom-cart" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="24" fill="#3b82f6" opacity="0.12"/><path d="M14 17h20l-2 12H16l-2-12z" stroke="#3b82f6" stroke-width="2" fill="#fff"/><circle cx="19" cy="35" r="2" fill="#3b82f6"/><circle cx="29" cy="35" r="2" fill="#3b82f6"/></svg>
@@ -291,5 +431,6 @@
     
     <button id="logoutButton" class="hidden">Logout</button>
   </div>
+>>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
 </body>
 </html>
