@@ -392,9 +392,39 @@
     </div>
     
     <div id="priceSection" class="hidden">
-        <div id="status">Loading...</div>
-        <div id="prices"></div>
-        <button id="saveButton" class="hidden">Save History</button>
+        <input type="text" id="searchInput" placeholder="Search for products...">
+        
+        <div class="site-buttons">
+            <button class="site-button" data-site="amazon">
+                <img src="https://www.amazon.com/favicon.ico" alt="Amazon">
+                Amazon
+            </button>
+            <button class="site-button" data-site="flipkart">
+                <img src="https://www.flipkart.com/favicon.ico" alt="Flipkart">
+                Flipkart
+            </button>
+            <button class="site-button" data-site="ebay">
+                <img src="https://www.ebay.com/favicon.ico" alt="eBay">
+                eBay
+            </button>
+            <button class="site-button" data-site="paytmmall">
+                <img src="https://paytmmall.com/favicon.ico" alt="Paytm Mall">
+                Paytm Mall
+            </button>
+            <button class="site-button" data-site="jiomart">
+                <img src="https://www.jiomart.com/favicon.ico" alt="JioMart">
+                JioMart
+            </button>
+        </div>
+
+        <div id="searchResults" class="hidden">
+            <!-- Search results will be populated here -->
+        </div>
+
+        <div id="productHistory">
+            <h3>Search History</h3>
+            <!-- Product history will be populated here -->
+        </div>
     </div>
     
     <button id="logoutButton" class="hidden">Logout</button>

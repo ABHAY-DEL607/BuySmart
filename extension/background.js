@@ -146,4 +146,33 @@ function isAuthenticated() {
 =======
     return true;
 });
+<<<<<<< HEAD
+
+// Listen for messages from website
+chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
+    console.log("External message received in background script:", message);
+    
+    // Handle login/signup success messages
+    if (message.type === 'LOGIN_SUCCESS' || message.type === 'SIGNUP_SUCCESS') {
+        console.log("Auth success message received, storing token");
+        
+        // Store the token
+        chrome.storage.local.set({ token: message.token }, () => {
+            console.log("Token stored successfully");
+            sendResponse({ success: true });
+            
+            // Notify any open popup
+            chrome.runtime.sendMessage({
+                action: "auth_success",
+                token: message.token
+            });
+        });
+        
+        return true; // Keep the messaging channel open for the async response
+    }
+    
+    return false;
+});
+=======
 >>>>>>> 445aef37f197c5cdba226b30b59683ed5b963ffa
+>>>>>>> 68afcd953c83c0496b1f23f5060313cbea25f1e3

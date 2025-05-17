@@ -15,21 +15,31 @@ const platformRoutes = require('./Routes/platformRoutes');
 const sharingRoutes = require('./Routes/SharingRoutes');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = 5000;
 
-// Security middleware
-app.use(helmet());
+// Security middleware - disable for local development to avoid CORS issues
+// app.use(helmet());
+// Use a more permissive helmet configuration
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // Logging middleware
 app.use(morgan('dev'));
 
-// CORS configuration
+// CORS configuration - make it more permissive for local development
 app.use(cors({
-    origin: ['http://localhost:3000', 'chrome-extension://*'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    origin: '*', // Allow all origins in development
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token', 'Access-Control-Allow-Origin']
 }));
+
+// Add pre-flight handling for all routes
+app.options('*', cors());
 
 // Body parser middleware
 app.use(express.json());
@@ -50,6 +60,15 @@ app.use('/api/sharing', sharingRoutes);
 // Health check route
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
+
+// Simple test route for checking auth functionality without MongoDB
+app.get('/test', (req, res) => {
+    res.status(200).json({ 
+      status: 'OK', 
+      message: 'Test endpoint is working',
+      note: 'You can use testuser/password123 to test login in fallback mode'
+    });
 });
 
 // Error handling middleware
@@ -73,11 +92,10 @@ app.use((req, res) => {
 // Start server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    console.log(`Test endpoint: http://localhost:${port}/test`);
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err);
-    // Close server & exit process
-    server.close(() => process.exit(1));
 });

@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import PrelineScript from "@/components/PrelineScript";
+import HydrationFixer from "@/components/HydrationFixer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,10 +21,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
+        <HydrationFixer />
         <PrelineScript />
         <Toaster />
         {children}

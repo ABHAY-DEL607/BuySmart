@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from 'next/link'
+import SuppressedSVG from './SuppressedSVG'
 
 const Navbar = () => {
   return (
@@ -25,7 +26,7 @@ const Navbar = () => {
           aria-label="Toggle navigation"
           data-hs-collapse="#hs-header-base"
         >
-          <svg
+          <SuppressedSVG
             className="hs-collapse-open:hidden size-4"
             xmlns="http://www.w3.org/2000/svg"
             width={24}
@@ -40,8 +41,8 @@ const Navbar = () => {
             <line x1={3} x2={21} y1={6} y2={6} />
             <line x1={3} x2={21} y1={12} y2={12} />
             <line x1={3} x2={21} y1={18} y2={18} />
-          </svg>
-          <svg
+          </SuppressedSVG>
+          <SuppressedSVG
             className="hs-collapse-open:block shrink-0 hidden size-4"
             xmlns="http://www.w3.org/2000/svg"
             width={24}
@@ -55,7 +56,7 @@ const Navbar = () => {
           >
             <path d="M18 6 6 18" />
             <path d="m6 6 12 12" />
-          </svg>
+          </SuppressedSVG>
           <span className="sr-only">Toggle navigation</span>
         </button>
         {/* End Collapse Button */}
@@ -87,7 +88,7 @@ const Navbar = () => {
                     aria-expanded="false"
                     aria-label="Dropdown"
                   >
-                    <svg
+                    <SuppressedSVG
                       className="shrink-0 size-4 me-3 md:me-2 block md:hidden"
                       xmlns="http://www.w3.org/2000/svg"
                       width={24}
@@ -104,9 +105,9 @@ const Navbar = () => {
                       <path d="M10 6h11" />
                       <path d="M10 12h11" />
                       <path d="M10 18h11" />
-                    </svg>
+                    </SuppressedSVG>
                     Dropdown
-                    <svg
+                    <SuppressedSVG
                       className="hs-dropdown-open:-rotate-180 md:hs-dropdown-open:rotate-0 duration-300 shrink-0 size-4 ms-auto md:ms-1"
                       xmlns="http://www.w3.org/2000/svg"
                       width={24}
@@ -119,7 +120,7 @@ const Navbar = () => {
                       strokeLinejoin="round"
                     >
                       <path d="m6 9 6 6 6-6" />
-                    </svg>
+                    </SuppressedSVG>
                   </button>
                   <div
                     className="hs-dropdown-menu transition-[opacity,margin] duration-[0.1ms] md:duration-[150ms] hs-dropdown-open:opacity-100 opacity-0 relative w-full md:w-52 hidden z-10 top-full ps-7 md:ps-0 md:bg-white md:rounded-lg md:shadow-md before:absolute before:-top-4 before:start-0 before:w-full before:h-5 md:after:hidden after:absolute after:top-1 after:start-4.5 after:w-0.5 after:h-[calc(100%-4px)] after:bg-gray-100 dark:md:bg-neutral-800 dark:after:bg-neutral-700"
@@ -141,7 +142,7 @@ const Navbar = () => {
                           className="hs-dropdown-toggle w-full flex justify-between items-center text-sm text-gray-800 rounded-lg p-2 md:px-3 hover:bg-gray-100 focus:outline-hidden focus:bg-gray-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-neutral-300 dark:focus:bg-neutral-700 dark:focus:text-neutral-300"
                         >
                           Sub Menu
-                          <svg
+                          <SuppressedSVG
                             className="hs-dropdown-open:-rotate-180 md:hs-dropdown-open:-rotate-90 md:-rotate-90 duration-300 ms-auto shrink-0 size-4"
                             xmlns="http://www.w3.org/2000/svg"
                             width={24}
@@ -154,7 +155,7 @@ const Navbar = () => {
                             strokeLinejoin="round"
                           >
                             <path d="m6 9 6 6 6-6" />
-                          </svg>
+                          </SuppressedSVG>
                         </button>
                         <div
                           className="hs-dropdown-menu transition-[opacity,margin] duration-[0.1ms] md:duration-[150ms] hs-dropdown-open:opacity-100 opacity-0 relative md:w-48 hidden z-10 md:mt-2 md:mx-2.5! md:top-0 md:end-full ps-7 md:ps-0 md:bg-white md:rounded-lg md:shadow-md dark:bg-neutral-800 dark:divide-neutral-700 before:hidden md:before:block before:absolute before:-end-5 before:top-0 before:h-full before:w-5 md:after:hidden after:absolute after:top-1 after:start-4.5 after:w-0.5 after:h-[calc(100%-4px)] after:bg-gray-100 dark:md:bg-neutral-800 dark:after:bg-neutral-700"
@@ -204,7 +205,7 @@ const Navbar = () => {
                   className="p-2 flex items-center text-sm text-gray-800 hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                   href="#"
                 >
-                  <svg
+                  <SuppressedSVG
                     className="shrink-0 size-4 me-3 md:me-2 block md:hidden"
                     xmlns="http://www.w3.org/2000/svg"
                     width={24}
@@ -218,14 +219,14 @@ const Navbar = () => {
                   >
                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                     <circle cx={12} cy={7} r={4} />
-                  </svg>
+                  </SuppressedSVG>
                   Account
                 </a>
                 <a
                   className="p-2 flex items-center text-sm text-gray-800 hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                   href="#"
                 >
-                  <svg
+                  <SuppressedSVG
                     className="shrink-0 size-4 me-3 md:me-2 block md:hidden"
                     xmlns="http://www.w3.org/2000/svg"
                     width={24}
@@ -241,14 +242,14 @@ const Navbar = () => {
                     <path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
                     <path d="M22 13a18.15 18.15 0 0 1-20 0" />
                     <rect width={20} height={14} x={2} y={6} rx={2} />
-                  </svg>
+                  </SuppressedSVG>
                   Work
                 </a>
                 <a
                   className="p-2 flex items-center text-sm text-gray-800 hover:bg-gray-100 rounded-lg focus:outline-hidden focus:bg-gray-100 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:focus:bg-neutral-700"
                   href="#"
                 >
-                  <svg
+                  <SuppressedSVG
                     className="shrink-0 size-4 me-3 md:me-2 block md:hidden"
                     xmlns="http://www.w3.org/2000/svg"
                     width={24}
@@ -264,7 +265,7 @@ const Navbar = () => {
                     <path d="M18 14h-8" />
                     <path d="M15 18h-5" />
                     <path d="M10 6h8v4h-8V6Z" />
-                  </svg>
+                  </SuppressedSVG>
                   Blog
                 </a>
               </div>
