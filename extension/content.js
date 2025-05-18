@@ -1,69 +1,94 @@
 (function () {
-    function getProductData() {
-        let productName, productPrice, site, discount, specialOffer;
-
-        const url = window.location.href;
-        if (url.includes("flipkart.com")) {
-            site = "Flipkart";
-            productName = document.querySelector("span.B_NuCI")?.innerText || "Unknown Product";
-            productPrice = document.querySelector("div._30jeq3._16Jk6d")?.innerText || "N/A";
-            discount = document.querySelector("div._3Ay6Sb span")?.innerText || "";
-            specialOffer = document.querySelector("div._2Tpdn3._18hQoS")?.innerText || "";
-        } else if (url.includes("amazon.in")) {
-            site = "Amazon";
-            productName = document.querySelector("#productTitle")?.innerText || "Unknown Product";
-            productPrice = document.querySelector("span.a-price-whole")?.innerText || "N/A";
-            discount = document.querySelector(".savingsPercentage")?.innerText || "";
-            specialOffer = document.querySelector(".a-section .a-text-bold")?.innerText || "";
-        } else if (url.includes("paytmmall.com")) {
-            site = "Paytm Mall";
-            productName = document.querySelector("h1.NZJI")?.innerText || "Unknown Product";
-            productPrice = document.querySelector("span._1V3w")?.innerText || "N/A";
-            discount = document.querySelector(".discount")?.innerText || "";
-            specialOffer = document.querySelector(".offer-text")?.innerText || "";
-        } else if (url.includes("ebay.com")) {
-            site = "eBay";
-            productName = document.querySelector("h1.x-item-title__mainTitle")?.innerText || "Unknown Product";
-            productPrice = document.querySelector("span.x-price-primary")?.innerText || "N/A";
-            discount = document.querySelector(".d-bin-discount")?.innerText || "";
-            specialOffer = document.querySelector(".d-bin-special-offer")?.innerText || "";
-        } else if (url.includes("jiomart.com")) {
-            site = "JioMart";
-            productName = document.querySelector("h1.title")?.innerText || "Unknown Product";
-            productPrice = document.querySelector("div.price-box span.final-price")?.innerText || "N/A";
-            discount = document.querySelector(".discount")?.innerText || "";
-            specialOffer = document.querySelector(".offer")?.innerText || "";
-        } else {
-            return null;
-        }
-
-        return {
-            productName: productName.trim(),
-            productPrice: productPrice.trim(),
-            site,
-            discount: discount.trim(),
-            specialOffer: specialOffer.trim()
-        };
+    // Ensure chrome.runtime is defined and accessible
+    if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.sendMessage) {
+        return; // Silently exit if not in Chrome extension context
     }
 
-    // Listen for messages from popup
+    const supportedSites = [
+        {
+            domain: "amazon.in",
+            name: "Amazon",
+            productNameSelector: "#productTitle",
+            productPriceSelector: "span.a-price-whole",
+            imageSelector: "img#landingImage",
+            ratingSelector: "span.a-icon-alt",
+            discountSelector: "span.a-size-large.a-color-price"
+        },
+        {
+            domain: "flipkart.com",
+            name: "Flipkart",
+            productNameSelector: "span.B_NuCI",
+            productPriceSelector: "div._30jeq3._16Jk6d",
+            imageSelector: "img._396cs4",
+            ratingSelector: "div._3LWZlK",
+            discountSelector: "div._3Ay6Sb"
+        },
+        {
+            domain: "paytmmall.com",
+            name: "Paytm Mall",
+            productNameSelector: "h1.NZJI",
+            productPriceSelector: "span._1V3w",
+            imageSelector: "img._3togXc",
+            ratingSelector: "div._1lRcqv",
+            discountSelector: "div._3DWFGc"
+        },
+        {
+            domain: "jiomart.com",
+            name: "JioMart",
+            productNameSelector: "h1.title",
+            productPriceSelector: "div.price-box span.final-price",
+            imageSelector: "img.product-image",
+            ratingSelector: "div.rating-box",
+            discountSelector: "div.discount-label"
+        },
+        {
+            domain: "ebay.com",
+            name: "eBay",
+            productNameSelector: "h1.x-item-title__mainTitle",
+            productPriceSelector: "span.x-price-primary",
+            imageSelector: "img.s-item__image-img",
+            ratingSelector: "div.x-star-rating",
+            discountSelector: "div.s-item__discount"
+        }
+    ];
+
+    function getProductData() {
+        const url = window.location.href;
+        const site = supportedSites.find(s => url.includes(s.domain));
+        if (!site) return null;
+
+        try {
+            const productName = document.querySelector(site.productNameSelector)?.textContent.trim() || 'Unknown Product';
+            const productPrice = document.querySelector(site.productPriceSelector)?.textContent.trim() || 'N/A';
+            const productImage = document.querySelector(site.imageSelector)?.src || '';
+            const rating = document.querySelector(site.ratingSelector)?.textContent.trim() || '';
+            const discount = document.querySelector(site.discountSelector)?.textContent.trim() || '';
+
+            if (!productName || productPrice === 'N/A') return null;
+
+            return {
+                name: productName,
+                price: productPrice,
+                site: site.name,
+                image: productImage,
+                rating,
+                discount,
+                url
+            };
+        } catch (error) {
+            console.error('Error extracting product data:', error);
+            return null;
+        }
+    }
+
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (request.action === "getProductData") {
-            // Get product data from the current page
-            const productData = {
-                productName: document.querySelector('h1')?.textContent || 'Unknown Product',
-                productPrice: document.querySelector('[data-price]')?.textContent || 'Price not available',
-                site: window.location.hostname,
-                discount: document.querySelector('.discount')?.textContent || null,
-                specialOffer: document.querySelector('.special-offer')?.textContent || null
-            };
-            
+            const productData = getProductData();
             sendResponse({ data: productData });
         }
-        return true; // Keep the message channel open for async response
+        return true;
     });
 
-    // Send product data on page load
     const data = getProductData();
     if (data) {
         chrome.runtime.sendMessage({ action: "productData", data });
