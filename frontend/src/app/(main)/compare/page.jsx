@@ -4,6 +4,14 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import { API_URL } from '@/services/config';
 
+const SUPPORTED_SITES = [
+    { id: 'amazon', name: 'Amazon' },
+    { id: 'flipkart', name: 'Flipkart' },
+    { id: 'paytmmall', name: 'Paytm Mall' },
+    { id: 'jiomart', name: 'JioMart' },
+    { id: 'ebay', name: 'eBay' },
+];
+
 const Compare = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -14,6 +22,7 @@ const Compare = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [comparisons, setComparisons] = useState([]);
     
+<<<<<<< HEAD
     // Dummy data for now - this would be fetched from API
     const dummyComparisons = {
         'iphone': [
@@ -40,51 +49,71 @@ const Compare = () => {
     };
     
     // Fetch comparison data on load or when query changes
+=======
+>>>>>>> 40c95606bca032e1791b17023c9fa38589e2a1b3
     useEffect(() => {
-        if (query) {
+        const fetchComparisons = async () => {
+            if (!query) return;
             setIsLoading(true);
-            // Simulate API call
-            setTimeout(() => {
-                // Find best match from dummy data
-                const matchingKey = Object.keys(dummyComparisons).find(key => 
-                    query.toLowerCase().includes(key)
+            setComparisons([]);
+            let allResults = [];
+            try {
+                await Promise.all(
+                    SUPPORTED_SITES.map(async (site) => {
+                        const searchUrl = getSearchUrl(site.id, query);
+                        const res = await fetch(`${API_URL}/api/scrape/${site.id}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ query, url: searchUrl })
+                        });
+                        const data = await res.json();
+                        if (data.products && data.products.length > 0) {
+                            // Take the first product as the best match for now
+                            const p = data.products[0];
+                            allResults.push({
+                                site: site.name,
+                                price: p.price ? `₹${p.price.toLocaleString()}` : 'N/A',
+                                delivery: 'Free', // You can enhance this if your backend provides delivery info
+                                rating: p.rating || 'N/A',
+                                url: p.url || '#',
+                            });
+                        }
+                    })
                 );
-                
-                if (matchingKey) {
-                    setComparisons(dummyComparisons[matchingKey]);
+                if (allResults.length > 0) {
+                    setComparisons(allResults);
                     toast.success(`Found prices for "${query}"`);
                 } else {
-                    setComparisons([]);
                     toast.error(`No results found for "${query}"`);
                 }
-                setIsLoading(false);
-            }, 1500);
-            
-            // TODO: Replace with actual API call when ready
-            // Example:
-            // fetch(`${API_URL}/api/compare?q=${encodeURIComponent(query)}`)
-            //     .then(res => res.json())
-            //     .then(data => {
-            //         setComparisons(data);
-            //         setIsLoading(false);
-            //     })
-            //     .catch(err => {
-            //         console.error(err);
-            //         toast.error('Error fetching comparison data');
-            //         setIsLoading(false);
-            //     });
-        } else if (category) {
-            // Handle category-based search
-            setIsLoading(true);
-            setTimeout(() => {
-                // Just show a random comparison for the demo
-                const keys = Object.keys(dummyComparisons);
-                const randomKey = keys[Math.floor(Math.random() * keys.length)];
-                setComparisons(dummyComparisons[randomKey]);
-                setIsLoading(false);
-            }, 1500);
+            } catch (err) {
+                console.error(err);
+                toast.error('Error fetching comparison data');
+            }
+            setIsLoading(false);
+        };
+
+        if (query) {
+            fetchComparisons();
         }
-    }, [query, category]);
+    }, [query]);
+
+    function getSearchUrl(siteId, query) {
+        switch(siteId) {
+            case 'amazon':
+                return `https://www.amazon.in/s?k=${encodeURIComponent(query)}`;
+            case 'flipkart':
+                return `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
+            case 'paytmmall':
+                return `https://paytmmall.com/search?q=${encodeURIComponent(query)}`;
+            case 'jiomart':
+                return `https://www.jiomart.com/search/${encodeURIComponent(query)}`;
+            case 'ebay':
+                return `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}`;
+            default:
+                return '';
+        }
+    }
     
     const handleSearch = (e) => {
         e.preventDefault();
@@ -95,17 +124,20 @@ const Compare = () => {
         }
     };
     
-    // Find the best deal
+    // Filter out comparisons with price < 100
+    const filteredComparisons = comparisons.filter(item => {
+        const price = parseInt(item.price.replace(/[^\d]/g, ''));
+        return price >= 100;
+    });
+    // Find the best deal from filtered comparisons
     const getBestDeal = () => {
-        if (!comparisons.length) return null;
-        
-        return comparisons.reduce((best, current) => {
+        if (!filteredComparisons.length) return null;
+        return filteredComparisons.reduce((best, current) => {
             const bestPrice = parseInt(best.price.replace(/[^\d]/g, ''));
             const currentPrice = parseInt(current.price.replace(/[^\d]/g, ''));
             return currentPrice < bestPrice ? current : best;
-        }, comparisons[0]);
+        }, filteredComparisons[0]);
     };
-    
     const bestDeal = getBestDeal();
     
     return (
@@ -171,8 +203,15 @@ const Compare = () => {
                 </div>
             )}
             
+            {/* Show warning if all results are filtered out */}
+            {!isLoading && comparisons.length > 0 && filteredComparisons.length === 0 && (
+                <div className="mb-8 bg-yellow-50 p-6 rounded-lg border border-yellow-200 text-yellow-800">
+                    No realistic prices found. All results were filtered out as too low to be genuine product prices.
+                </div>
+            )}
+            
             {/* Comparison table */}
-            {!isLoading && comparisons.length > 0 && (
+            {!isLoading && filteredComparisons.length > 0 && (
                 <div className="overflow-x-auto">
                     <table className="min-w-full bg-white rounded-lg overflow-hidden">
                         <thead className="bg-gray-100">
@@ -195,7 +234,7 @@ const Compare = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                            {comparisons.map((item, index) => (
+                            {filteredComparisons.map((item, index) => (
                                 <tr key={index} className={item === bestDeal ? 'bg-green-50' : ''}>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="font-medium text-gray-900">{item.site}</div>

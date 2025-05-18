@@ -86,19 +86,19 @@ document.addEventListener("DOMContentLoaded", function () {
             `;
 
             if (discount) {
-                priceHTML += <p><strong>Discount:</strong> ${discount}</p>;
+                priceHTML += `<p><strong>Discount:</strong> ${discount}</p>`;
             }
             if (specialOffer) {
-                priceHTML += <p><strong>Special Offer:</strong> ${specialOffer}</p>;
+                priceHTML += `<p><strong>Special Offer:</strong> ${specialOffer}</p>`;
             }
 
             if (site.toLowerCase().includes("flipkart")) {
-                priceHTML += <p><em>Eligible for Flipkart Plus benefits and No Cost EMI!</em></p>;
+                priceHTML += `<p><em>Eligible for Flipkart Plus benefits and No Cost EMI!</em></p>`;
             } else if (site.toLowerCase().includes("ebay")) {
-                priceHTML += <p><em>Comes with eBay Authenticity Guarantee!</em></p>;
+                priceHTML += `<p><em>Comes with eBay Authenticity Guarantee!</em></p>`;
             }
 
-            priceHTML += <p><strong>Comparing Prices...</strong></p>;
+            priceHTML += `<p><strong>Comparing Prices...</strong></p>`;
             pricesElement.innerHTML = priceHTML;
 
             chrome.runtime.sendMessage({ action: "comparePrices", data: { productName, site } }, (comparisonResponse) => {
@@ -108,8 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 let comparisons = comparisonResponse.prices.map(({ site, price }) => {
-                    let comparisonHTML = <p><strong>${site}:</strong> ${price}</p>;
-                    return comparisonHTML;
+                    return `<p><strong>${site}:</strong> ${price}</p>`;
                 }).join("");
                 pricesElement.innerHTML += comparisons;
                 saveButton.classList.remove("hidden");
