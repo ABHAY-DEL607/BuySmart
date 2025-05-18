@@ -19,20 +19,23 @@ const Compare = () => {
         'iphone': [
             { site: 'Amazon', price: '₹79,900', delivery: 'Free', rating: 4.5, url: 'https://amazon.in' },
             { site: 'Flipkart', price: '₹78,499', delivery: '₹40', rating: 4.4, url: 'https://flipkart.com' },
-            { site: 'Croma', price: '₹79,999', delivery: 'Free', rating: 4.3, url: 'https://croma.com' },
-            { site: 'Reliance Digital', price: '₹80,900', delivery: 'Free', rating: 4.2, url: 'https://reliancedigital.in' },
+            { site: 'JioMart', price: '₹79,499', delivery: 'Free', rating: 4.2, url: 'https://jiomart.com' },
+            { site: 'eBay', price: '₹78,999', delivery: '₹99', rating: 4.3, url: 'https://ebay.in' },
+{ site: 'Paytm Mall', price: '₹79,299', delivery: '₹50', rating: 4.1, url: 'https://paytmmall.com' }
         ],
         'samsung': [
             { site: 'Amazon', price: '₹59,900', delivery: 'Free', rating: 4.3, url: 'https://amazon.in' },
             { site: 'Flipkart', price: '₹58,499', delivery: '₹40', rating: 4.5, url: 'https://flipkart.com' },
-            { site: 'Croma', price: '₹60,999', delivery: 'Free', rating: 4.2, url: 'https://croma.com' },
-            { site: 'Reliance Digital', price: '₹59,900', delivery: 'Free', rating: 4.0, url: 'https://reliancedigital.in' },
+            { site: 'JioMart', price: '₹58,999', delivery: 'Free', rating: 4.1, url: 'https://jiomart.com' },
+            { site: 'eBay', price: '₹59,499', delivery: '₹99', rating: 4.2, url: 'https://ebay.in' },
+            { site: 'Paytm Mall', price: '₹59,299', delivery: '₹50', rating: 4.0, url: 'https://paytmmall.com' }
         ],
         'headphones': [
             { site: 'Amazon', price: '₹24,900', delivery: 'Free', rating: 4.7, url: 'https://amazon.in' },
             { site: 'Flipkart', price: '₹25,499', delivery: '₹40', rating: 4.6, url: 'https://flipkart.com' },
-            { site: 'Croma', price: '₹24,999', delivery: 'Free', rating: 4.4, url: 'https://croma.com' },
-            { site: 'Headphone Zone', price: '₹24,900', delivery: '₹199', rating: 4.8, url: 'https://headphonezone.in' },
+            { site: 'JioMart', price: '₹24,799', delivery: 'Free', rating: 4.3, url: 'https://jiomart.com' },
+            { site: 'eBay', price: '₹25,299', delivery: '₹99', rating: 4.4, url: 'https://ebay.in' },
+{ site: 'Paytm Mall', price: '₹24,999', delivery: '₹50', rating: 4.2, url: 'https://paytmmall.com' }
         ]
     };
     

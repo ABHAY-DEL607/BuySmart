@@ -1,8 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './src/app/**/*.{js,ts,jsx,tsx}',
-    './src/components/**/*.{js,ts,jsx,tsx}',
+    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -24,29 +25,6 @@ module.exports = {
           '100%': { opacity: 1, transform: 'translateY(0)' },
         },
       },
-    },
-  },
-  plugins: [],
-}
-
-module.exports = {
-  darkMode: ["class"],
-  content: [
-    "./pages/**/*.{js,jsx,mdx}",
-    "./components/**/*.{js,jsx,mdx}",
-    "./app/**/*.{js,jsx,mdx}",
-    "*.{js,jsx,mdx}",
-    "*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
