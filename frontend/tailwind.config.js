@@ -16,56 +16,60 @@ module.exports = {
         poppins: ['"Poppins"', 'sans-serif'],
         bebas: ['"Bebas Neue"', 'sans-serif'],
       },
-      animation: {
-        fadeInUp: 'fadeInUp 0.6s ease-out both',
+      colors: {
+        border: "rgba(255, 255, 255, 0.2)",
+        input: "rgba(255, 255, 255, 0.1)",
+        ring: "#4158D0",
+        background: "transparent",
+        foreground: "#1F2937",
+        primary: {
+          DEFAULT: "#4158D0",
+          foreground: "#FFFFFF",
+        },
+        secondary: {
+          DEFAULT: "#7DD3FC",
+          foreground: "#1F2937",
+        },
+        destructive: {
+          DEFAULT: "#EF4444",
+          foreground: "#FFFFFF",
+        },
+        muted: {
+          DEFAULT: "rgba(255, 255, 255, 0.7)",
+          foreground: "#6B7280",
+        },
+        accent: {
+          DEFAULT: "#4C1D95",
+          foreground: "#FFFFFF",
+        },
+        popover: {
+          DEFAULT: "rgba(255, 255, 255, 0.95)",
+          foreground: "#1F2937",
+        },
+        card: {
+          DEFAULT: "rgba(255, 255, 255, 0.95)",
+          foreground: "#1F2937",
+        },
+      },
+      borderRadius: {
+        lg: "1rem",
+        md: "calc(1rem - 2px)",
+        sm: "calc(1rem - 4px)",
       },
       keyframes: {
         fadeInUp: {
           '0%': { opacity: 0, transform: 'translateY(20px)' },
           '100%': { opacity: 1, transform: 'translateY(0)' },
         },
-      },
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+        glow: {
+          '0%': { boxShadow: '0 0 5px rgba(79, 70, 229, 0.3), 0 0 10px rgba(79, 70, 229, 0.2)' },
+          '50%': { boxShadow: '0 0 20px rgba(79, 70, 229, 0.6), 0 0 30px rgba(79, 70, 229, 0.4)' },
+          '100%': { boxShadow: '0 0 5px rgba(79, 70, 229, 0.3), 0 0 10px rgba(79, 70, 229, 0.2)' },
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+        pulse: {
+          '0%, 100%': { opacity: 1 },
+          '50%': { opacity: 0.8 },
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -76,6 +80,9 @@ module.exports = {
         },
       },
       animation: {
+        fadeInUp: 'fadeInUp 0.6s ease-out both',
+        glow: 'glow 2s ease-in-out infinite',
+        pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
