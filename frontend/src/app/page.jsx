@@ -253,37 +253,6 @@ const HomePage = () => {
           </div>
         </motion.section>
 
-<<<<<<< HEAD
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="py-20 bg-slate-50"
-        >
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-14">
-              <h2 className="text-4xl font-bold text-slate-800 mb-4">How BuySmart Works</h2>
-              <p className="text-slate-600 max-w-2xl mx-auto">Finding the best deals has never been easier.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              {howItWorks.map((step, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.2 }}
-                >
-                  <Card className="border-none shadow-lg card-hover">
-                    <CardContent className="pt-6">
-                      <div className="flex flex-col items-center text-center">
-                        <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mb-4">
-                          {step.icon}
-                        </div>
-                        <h3 className="text-xl font-semibold mb-2 text-slate-800">{step.step}</h3>
-                        <p className="text-slate-600">{step.description}</p>
-=======
       {/* Platforms Section */}
       <section className="relative z-10 bg-white py-12">
         <div className="container mx-auto px-4">
@@ -391,53 +360,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="relative z-10 bg-slate-50 py-16 sm:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">What Our Users Say</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              Join thousands of smart shoppers who save money with BuySmart
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardContent className="p-6">
-                  <div className="flex flex-col h-full">
-                    <div className="flex items-center mb-4">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${i < testimonial.rating ? "fill-yellow-400 text-yellow-400" : "text-slate-300"}`}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-slate-700 italic mb-6 flex-grow">"{testimonial.quote}"</p>
-                    <div className="flex items-center mt-auto">
-                      <Image
-                        src={testimonial.image || "/placeholder.svg"}
-                        alt={`Avatar of ${testimonial.author}`}
-                        width={40}
-                        height={40}
-                        className="rounded-full mr-3"
-                        loading="lazy"
-                        onError={(e) =>
-                          (e.target.src = "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg")
-                        }
-                      />
-                      <div>
-                        <p className="font-semibold text-sm text-slate-800">{testimonial.author}</p>
->>>>>>> 633e37ac56721eebcd667801101533ee773ff328
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
-
+     
         <footer className="bg-slate-900 text-white pt-20 pb-10">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">

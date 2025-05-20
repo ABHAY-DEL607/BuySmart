@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-export default function PrelineScript() { return null; }
 
 export default function PrelineScript() {
   const path = usePathname();
