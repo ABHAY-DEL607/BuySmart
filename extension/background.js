@@ -2,7 +2,7 @@ const supportedSites = [
     {
         domain: "amazon.in",
         name: "Amazon",
-        productNameSelector: "/html/body/div[1]/div[1]/div[1]/div[1]/div/span[1]/div[1]/div[3]/div/div/div/div/span/div/div/div/div[2]/div/div/div[1]/a/h2/span",
+        productNameSelector: "#productTitle, #title, h1.a-size-large, span.a-size-large",
         productPriceSelector: "span.a-price-whole, span.a-price, span.a-offscreen, span.a-color-price",
         searchUrl: "https://www.amazon.in/s?k={query}",
         searchResultsContainer: "div.s-result-item.s-asin, div[data-component-type='s-search-result']",

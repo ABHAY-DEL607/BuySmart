@@ -78,6 +78,18 @@
         }
     ];
 
+    function getTextByXPath(xpath) {
+        const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        const node = result.singleNodeValue;
+        return node ? node.textContent.trim() : null;
+    }
+
+    function getImageByXPath(xpath) {
+        const result = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+        const node = result.singleNodeValue;
+        return node && node.src ? node.src : null;
+    }
+
     function getProductData() {
         const url = window.location.href;
         const site = supportedSites.find(s => url.includes(s.domain));
@@ -88,12 +100,16 @@
             const getText = (selectors) => {
                 if (typeof selectors === 'string') selectors = [selectors];
                 for (const selector of selectors) {
-                    const elements = document.querySelectorAll(selector);
-                    for (const element of elements) {
-                        const text = element.textContent.trim();
-                        if (text) {
-                            // Clean up the text
-                            return text.replace(/\s+/g, ' ').trim();
+                    // Check if this is an XPath selector (starts with /)
+                    if (selector.startsWith('/')) {
+                        const text = getTextByXPath(selector);
+                        if (text) return text;
+                    } else {
+                        // CSS selector path
+                        const elements = document.querySelectorAll(selector);
+                        for (const element of elements) {
+                            const text = element.textContent.trim();
+                            if (text) return text.replace(/\s+/g, ' ').trim();
                         }
                     }
                 }
