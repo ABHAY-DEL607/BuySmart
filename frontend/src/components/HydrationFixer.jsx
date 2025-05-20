@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { addSuppressHydrationWarningToSVGs } from '@/utils/hydration';
+export default function HydrationFixer() { return null; }
 
 // This component applies fixes for hydration mismatches
 // caused by browser extensions like DarkReader
@@ -15,4 +16,3 @@ const HydrationFixer = () => {
   return null;
 };
 
-export default HydrationFixer; 

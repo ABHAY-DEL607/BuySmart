@@ -1,116 +1,171 @@
-"use client"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import {
-  Search,
-  ShoppingCart,
-  Tag,
-  TrendingUp,
-  Clock,
-  Zap,
-  Shield,
-  PieChart,
-  Star,
-} from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import * as THREE from 'three';
+import { Search, ShoppingCart, Zap } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { toast } from 'react-hot-toast';
 
 const HomePage = () => {
-  const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState("")
-  const [newsletterEmail, setNewsletterEmail] = useState("")
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const mountRef = useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Ensure component is mounted to avoid hydration issues
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // 3D Background Setup with Three.js
+  useEffect(() => {
+    if (!isMounted) return; // Prevent running during SSR
+    let renderer, scene, camera, particles;
+    try {
+      // Check WebGL availability
+      if (!window.WebGLRenderingContext || !mountRef.current) {
+        console.error('WebGL not supported or mount ref not found');
+        toast.error('3D background not supported in this browser');
+        return;
+      }
+
+      // Scene setup
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setClearColor(0x000000, 0);
+      mountRef.current.appendChild(renderer.domElement);
+      console.log('Three.js renderer initialized');
+
+      // Particle system
+      const geometry = new THREE.BufferGeometry();
+      const vertices = [];
+      const particleCount = 2000; // Increased for visibility
+      for (let i = 0; i < particleCount; i++) {
+        const x = Math.random() * 2000 - 1000;
+        const y = Math.random() * 2000 - 1000;
+        const z = Math.random() * 2000 - 1000;
+        vertices.push(x, y, z);
+      }
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+      const material = new THREE.PointsMaterial({
+        color: 0x6b7280, // Gray color to match slate theme
+        size: 4,
+        transparent: true,
+        opacity: 0.8,
+      });
+      particles = new THREE.Points(geometry, material);
+      scene.add(particles);
+      camera.position.z = 1000;
+
+      // Animation loop
+      const animate = () => {
+        if (!renderer) return; // Prevent animation if renderer is disposed
+        requestAnimationFrame(animate);
+        particles.rotation.x += 0.0007;
+        particles.rotation.y += 0.0007;
+        renderer.render(scene, camera);
+      };
+      animate();
+      console.log('Three.js animation started');
+
+      // Handle window resize
+      const handleResize = () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      };
+      window.addEventListener('resize', handleResize);
+
+      // Cleanup
+      return () => {
+        window.removeEventListener('resize', handleResize);
+        if (mountRef.current && renderer.domElement) {
+          mountRef.current.removeChild(renderer.domElement);
+        }
+        renderer.dispose();
+        console.log('Three.js cleanup completed');
+      };
+    } catch (error) {
+      console.error('Three.js initialization failed:', error);
+      toast.error('Failed to load 3D background');
+    }
+  }, [isMounted]);
 
   // Handle search form submission
   const handleSearch = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/compare?q=${encodeURIComponent(searchQuery)}`)
+      router.push(`/compare?q=${encodeURIComponent(searchQuery)}`);
+    } else {
+      toast.error('Please enter a product to search');
     }
-  }
+  };
 
   // Handle newsletter signup
   const handleNewsletterSignup = (e) => {
-    e.preventDefault()
-    console.log("Newsletter signup:", newsletterEmail)
-    setNewsletterEmail("")
-  }
+    e.preventDefault();
+    if (newsletterEmail.trim()) {
+      console.log('Newsletter signup:', newsletterEmail);
+      toast.success('Subscribed to newsletter!');
+      setNewsletterEmail('');
+    } else {
+      toast.error('Please enter a valid email');
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    console.log('User logged out');
+    toast.success('Logged out successfully');
+    router.push('/login');
+  };
 
   const platforms = [
-    { name: "Amazon", src: "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" },
-    { name: "Flipkart", src: "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flipkart_Logo.svg" },
-    { name: "JioMart", src: "https://www.jiomart.com/assets/jiomart-default/logo.png" },
-    { name: "Croma", src: "https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg" },
-    { name: "Reliance Digital", src: "https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg" },
-  ]
+    { name: 'Amazon', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
+    { name: 'Flipkart', src: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Flipkart_Logo.svg' },
+    { name: 'JioMart', src: 'https://www.jiomart.com/assets/jiomart-default/logo.png' },
+    { name: 'Ebay', src: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg' },
+    { name: 'PaytmMall', src: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg' },
+  ];
 
   const howItWorks = [
     {
-      step: "Search",
-      description: "Enter the product name you want to compare prices for.",
+      step: 'Search',
+      description: 'Enter the product name you want to compare prices for.',
       icon: <Search className="h-8 w-8" />,
     },
     {
-      step: "Compare",
-      description: "View prices from multiple e-commerce sites side by side.",
+      step: 'Compare',
+      description: 'View prices from multiple e-commerce sites side by side.',
       icon: <ShoppingCart className="h-8 w-8" />,
     },
     {
-      step: "Save",
-      description: "Choose the best deal and save money on your purchase.",
+      step: 'Save',
+      description: 'Choose the best deal and save money on your purchase.',
       icon: <Zap className="h-8 w-8" />,
     },
-  ]
+  ];
 
-  const testimonials = [
-    {
-      quote: "BuySmart saved me ₹3,000 on my new headphones!",
-      author: "Priya S., Bangalore",
-      image: "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
-      rating: 5,
-    },
-    {
-      quote: "I use this website for all my online shopping now.",
-      author: "Rahul M., Mumbai",
-      image: "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg",
-      rating: 4,
-    },
-    {
-      quote: "Found a better price on my laptop in seconds.",
-      author: "Anita K., Delhi",
-      image: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg",
-      rating: 5,
-    },
-  ]
-
-  const faqs = [
-    {
-      question: "Which websites does BuySmart support?",
-      answer:
-        "BuySmart compares prices from Amazon, Flipkart, JioMart, Croma, Reliance Digital, and many more Indian e-commerce sites.",
-    },
-    {
-      question: "Is BuySmart free to use?",
-      answer: "Yes, BuySmart is completely free for all users.",
-    },
-    {
-      question: "How does BuySmart find better prices?",
-      answer:
-        "Our website searches for the product across multiple supported platforms in real-time to find the best deals.",
-    },
-    {
-      question: "Is my data secure?",
-      answer:
-        "Yes, we only access the product information needed to find better prices. We don't store any sensitive data.",
-    },
-  ]
+  if (!isMounted) {
+    return null; // Prevent rendering during SSR to avoid hydration mismatch
+  }
 
   return (
     <div className="min-h-screen flex flex-col relative font-sans bg-slate-50">
+      {/* 3D Background */}
+      <div
+        ref={mountRef}
+        className="fixed inset-0 z-0"
+        style={{ pointerEvents: 'none' }}
+      />
+
       {/* Navbar */}
       <header className="sticky top-0 z-40 w-full backdrop-blur-sm bg-white/80 border-b border-slate-200">
         <div className="container mx-auto px-4 flex items-center justify-between h-16">
@@ -121,15 +176,21 @@ const HomePage = () => {
             <a href="/" className="text-slate-700 hover:text-indigo-600 transition-colors">
               Home
             </a>
-            <a href="/features" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              Features
+            <a href="/about" className="text-slate-700 hover:text-indigo-600 transition-colors">
+              About
             </a>
-            <a href="/pricing" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              Pricing
+            <a href="/contact" className="text-slate-700 hover:text-indigo-600 transition-colors">
+              Contact
             </a>
-            <a href="/support" className="text-slate-700 hover:text-indigo-600 transition-colors">
-              Support
+            <a href="/history" className="text-slate-700 hover:text-indigo-600 transition-colors">
+              Comparison History
             </a>
+            <Button
+              onClick={handleLogout}
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2"
+            >
+              Log Out
+            </Button>
           </nav>
         </div>
       </header>
@@ -139,7 +200,7 @@ const HomePage = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 leading-tight tracking-tight">
-              Find the Best{" "}
+              Find the Best{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
                 Deals
               </span>
@@ -147,8 +208,8 @@ const HomePage = () => {
             <p className="text-lg text-slate-600 mb-8">
               Compare prices across top Indian e-commerce sites and save money on your purchases.
             </p>
-            
-            {/* Search Form */}
+
+            {/* Search Form with Animation */}
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8">
               <div className="flex gap-4">
                 <Input
@@ -156,11 +217,11 @@ const HomePage = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Enter product name to compare prices..."
-                  className="flex-1 text-lg py-6"
+                  className="flex-1 text-lg py-6 border-gray-300 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-500/50 transition-all duration-500 ease-in-out transform hover:scale-105 focus:scale-105 animate-glow"
                 />
-                <Button 
+                <Button
                   type="submit"
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-8 py-6"
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-8 py-6 transition-all duration-300 ease-in-out transform hover:scale-105"
                 >
                   Compare Prices
                 </Button>
@@ -195,14 +256,14 @@ const HomePage = () => {
                 className="flex items-center justify-center h-12 transition-transform hover:scale-105"
               >
                 <Image
-                  src={platform.src || "/placeholder.svg"}
+                  src={platform.src || '/placeholder.svg'}
                   alt={`${platform.name} logo`}
                   width={120}
                   height={40}
                   className="object-contain h-full"
                   loading="lazy"
                   onError={(e) =>
-                    (e.target.src = "https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg")
+                    (e.target.src = 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg')
                   }
                 />
               </div>
@@ -238,123 +299,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="relative z-10 bg-white py-16 sm:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">Powerful Features</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              BuySmart does more than just compare prices. Discover all the ways it helps you shop smarter.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 mb-4">
-                  <Tag className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-slate-800">Real-time Price Comparison</h3>
-                <p className="text-slate-600">
-                  Instantly compare prices across multiple platforms with a single search.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 mb-4">
-                  <PieChart className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-slate-800">Price History Tracking</h3>
-                <p className="text-slate-600">
-                  See how prices have changed over time and know if you're getting a genuine deal.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 mb-4">
-                  <Clock className="h-6 w-6" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2 text-slate-800">Price Drop Alerts</h3>
-                <p className="text-slate-600">
-                  Get notified when prices drop for products you're watching across any platform.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="relative z-10 bg-slate-50 py-16 sm:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">What Our Users Say</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              Join thousands of smart shoppers who save money with BuySmart
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-shadow duration-300">
-                <CardContent className="p-6">
-                  <div className="flex flex-col h-full">
-                    <div className="flex items-center mb-4">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${i < testimonial.rating ? "fill-yellow-400 text-yellow-400" : "text-slate-300"}`}
-                        />
-                      ))}
-                    </div>
-                    <p className="text-slate-700 italic mb-6 flex-grow">"{testimonial.quote}"</p>
-                    <div className="flex items-center mt-auto">
-                      <Image
-                        src={testimonial.image || "/placeholder.svg"}
-                        alt={`Avatar of ${testimonial.author}`}
-                        width={40}
-                        height={40}
-                        className="rounded-full mr-3"
-                        loading="lazy"
-                        onError={(e) =>
-                          (e.target.src = "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg")
-                        }
-                      />
-                      <div>
-                        <p className="font-semibold text-sm text-slate-800">{testimonial.author}</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="relative z-10 bg-white py-16 sm:py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-800 mb-4">Frequently Asked Questions</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">Everything you need to know about BuySmart</p>
-          </div>
-          <div className="max-w-3xl mx-auto space-y-6">
-            {faqs.map((faq, index) => (
-              <Card key={index} className="border-none shadow-md hover:shadow-lg transition-shadow duration-300">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold mb-3 text-slate-800">{faq.question}</h3>
-                  <p className="text-slate-600">{faq.answer}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="bg-slate-900 text-white pt-16 pb-8">
         <div className="container mx-auto px-4">
@@ -368,10 +312,10 @@ const HomePage = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
               <ul className="space-y-2">
-                {["Home", "Features", "Pricing", "Support"].map((item) => (
+                {['Home', 'About', 'Contact', 'Comparison History'].map((item) => (
                   <li key={item}>
                     <a
-                      href={`/${item.toLowerCase()}`}
+                      href={`/${item.toLowerCase().replace(' ', '-')}`}
                       className="text-slate-400 hover:text-white transition-colors"
                     >
                       {item}
@@ -383,10 +327,10 @@ const HomePage = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4">Legal</h4>
               <ul className="space-y-2">
-                {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((item) => (
+                {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
                   <li key={item}>
                     <a
-                      href={`/${item.toLowerCase().replace(" ", "-")}`}
+                      href={`/${item.toLowerCase().replace(' ', '-')}`}
                       className="text-slate-400 hover:text-white transition-colors"
                     >
                       {item}
@@ -404,7 +348,7 @@ const HomePage = () => {
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="Your email address"
-                  className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                  className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 transition-all duration-500 ease-in-out transform hover:scale-105 focus:scale-105 focus:ring-4 focus:ring-indigo-500/50 animate-glow"
                   required
                 />
                 <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700">
@@ -419,9 +363,26 @@ const HomePage = () => {
           </div>
         </div>
       </footer>
+
+      {/* Inline CSS for Animations */}
+      <style jsx>{`
+        @keyframes glow {
+          0% {
+            box-shadow: 0 0 5px rgba(79, 70, 229, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.6);
+          }
+          100% {
+            box-shadow: 0 0 5px rgba(79, 70, 229, 0.3);
+          }
+        }
+        .animate-glow {
+          animation: glow 2s ease-in-out infinite;
+        }
+      `}</style>
     </div>
-  )
-}
+  );
+};
 
-export default HomePage
-
+export default HomePage;
