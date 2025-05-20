@@ -18,12 +18,12 @@ const supportedSites = [
         productNameSelector: "span.B_NuCI, h1._2I9KP_, div._2WkVRV, div._3pLy-c div._4rR01T",
         productPriceSelector: "div._30jeq3._16Jk6d, div._1_WHN1, div._16Jk6d, div._3pLy-c div._30jeq3",
         searchUrl: "https://www.flipkart.com/search?q={query}",
-        searchResultsContainer: "div._75nlfW, div._1AtVbE",
-        titleSelector: "div.KzDlHZ, div._4rR01T",
-        priceSelector: "div._30jeq3, div._30jeq3._1_WHN1",
-        imageSelector: "img._396cs4, img._2r_T1I, img._3exPp9, img._2QcLo1, img._1Nyybr, img._396cs4._2amPTt._3iAhhg",
-        ratingSelector: "div._3LWZlK, span._2I9KP_, div._1lRcqv, div._3pLy-c div._3LWZlK, div._1i0wkp, div._3LWZlK._1BLPMq",
-        discountSelector: "div._3Ay6Sb, div._3lqQdw, div._3pLy-c div._3Ay6Sb, div._1V_ZGU, div._3Ay6Sb._16Jk6d"
+        searchResultsContainer: "div.cPHDOP",
+        titleSelector: "div.KzDlHZ",
+        priceSelector: "div.Nx9bqj",
+        imageSelector: "img.DByuf4",
+        ratingSelector: "div.XQDdHH",
+        discountSelector: "div.UkUFwK"
     },
     {
         domain: "paytmmall.com",
@@ -41,15 +41,15 @@ const supportedSites = [
     {
         domain: "jiomart.com",
         name: "JioMart",
-        productNameSelector: "h1.title, div.product-name, div[class*='name'], div[class*='title'], div.product-card div[class*='name']",
-        productPriceSelector: "div.price-box span.final-price, div[class*='price'], span.final-price, div.product-card div[class*='price']",
+        productNameSelector: "div.plp-card-details-name",
+        productPriceSelector: "span.jm-heading-xxs",
         searchUrl: "https://www.jiomart.com/search/{query}",
-        searchResultsContainer: "div.product-item, div.jm-row-item, div[class*='product'], div.product-card, div.product-listing-item",
-        titleSelector: "div.product-name, div[class*='name'], div[class*='title'], div.product-card div[class*='name']",
-        priceSelector: "span.final-price, div[class*='price'], div.product-card div[class*='price']",
-        imageSelector: "img.product-image, img[class*='product'], img.lazy, div.product-card img, img.product-photo",
-        ratingSelector: "div.rating-box, div[class*='rating'], div.product-card div[class*='rating'], div.rating",
-        discountSelector: "div.discount-label, div[class*='discount'], div.product-card div[class*='discount'], div.discount"
+        searchResultsContainer: "div.plp-card-container",
+        titleSelector: "div.plp-card-details-name",
+        priceSelector: "span.jm-heading-xxs",
+        imageSelector: "img.lazyautosizes",
+        ratingSelector: "span.jm-badge",
+        discountSelector: "span.jm-badge"
     },
     {
         domain: "ebay.com",
@@ -57,7 +57,7 @@ const supportedSites = [
         productNameSelector: "h1.x-item-title__mainTitle",
         productPriceSelector: "span.x-price-primary",
         searchUrl: "https://www.ebay.com/sch/i.html?_nkw={query}",
-        searchResultsContainer: "li.s-item",
+        searchResultsContainer: "div.s-item__wrapper",
         titleSelector: "div.s-item__title",
         priceSelector: "span.s-item__price",
         imageSelector: "img.s-item__image-img",
@@ -552,6 +552,7 @@ async function searchProducts(query, productLink) {
                             };
 
                             const getImage = (element, selectors) => {
+                                // 1. First try the regular selector approach
                                 if (typeof selectors === 'string') selectors = [selectors];
                                 for (const selector of selectors) {
                                     const child = element.querySelector(selector);
@@ -559,6 +560,33 @@ async function searchProducts(query, productLink) {
                                         return child.src;
                                     }
                                 }
+                                
+                                // 2. Special case for eBay
+                                if (site.domain === 'ebay.com') {
+                                    // Look for image within s-item__image div
+                                    const imageContainer = element.querySelector('div.s-item__image');
+                                    if (imageContainer) {
+                                        const img = imageContainer.querySelector('img');
+                                        if (img?.src) {
+                                            return img.src;
+                                        }
+                                    }
+                                    
+                                    // Fallback to any image in the item wrapper
+                                    const anyImg = element.querySelector('img');
+                                    if (anyImg?.src) {
+                                        return anyImg.src;
+                                    }
+                                }
+                                
+                                // 3. General fallback - try to find any img tag
+                                const imgs = element.querySelectorAll('img');
+                                for (const img of imgs) {
+                                    if (img.src && !img.src.includes('spacer.gif')) {
+                                        return img.src;
+                                    }
+                                }
+                                
                                 return null;
                             };
 
@@ -635,6 +663,8 @@ async function searchProducts(query, productLink) {
                 }
                 
                 const extractedProducts = extractionResult[0].result;
+                console.log(extractedProducts);
+                
                 logSiteAccess(site.name, `extracted ${extractedProducts.length} products`);
                 
                 return extractedProducts.map(product => ({
