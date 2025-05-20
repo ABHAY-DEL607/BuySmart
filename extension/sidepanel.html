@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BuySmart Sidepanel</title>
+    <style>
+        body {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            background-color: #f7f9fc;
+            overflow-x: hidden;
+        }
+        
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        header {
+            background: linear-gradient(to right, #4a90e2, #2574d9);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 100%;
+        }
+
+        /* Authentication section */
+        #authSection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4a90e2;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2574d9;
+        }
+
+        #logoutButton {
+            background-color: #e74c3c;
+        }
+
+        #logoutButton:hover {
+            background-color: #c0392b;
+        }
+
+        /* Search section */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        /* Results section */
+        #searchResults, #results, #prices {
+            margin-top: 20px;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .loading {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .site-section {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-left: 4px solid;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .site-header {
+            padding: 10px;
+            background-color: #f9f9f9;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .site-name {
+            font-weight: 600;
+        }
+
+        .products-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .product-card {
+            display: flex;
+            gap: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border: 1px solid #eee;
+        }
+
+        .product-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .product-name {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .product-price {
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        .product-rating {
+            font-size: 12px;
+            color: #f39c12;
+        }
+
+        .view-product-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            background-color: #4a90e2;
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* Price comparison */
+        .price-comparison {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .price-comparison:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-list {
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-top: 15px;
+            background-color: white;
+        }
+
+        .comparison-header {
+            margin-top: 20px;
+            margin-bottom: 5px;
+        }
+
+        /* Error messages */
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Smart Tip */
+        #smartTip {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* History section */
+        #historySection {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: white;
+        }
+
+        .history-product {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .history-product img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .history-prices {
+            margin-top: 10px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid #4a90e2;
+            color: #4a90e2;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .product-card {
+                flex-direction: column;
+            }
+            
+            .product-image {
+                width: 100%;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg-canvas"></canvas>
+    
+    <header>
+        <h1>BuySmart</h1>
+    </header>
+    
+    <div class="container">
+        <!-- Smart Tip -->
+        <div id="smartTip" class="hidden">Smart Tip: Compare prices across multiple sites!</div>
+        
+        <!-- Authentication Section -->
+        <div id="authSection" class="hidden">
+            <div id="authMessage">Please login or register to use BuySmart</div>
+            <div class="auth-buttons">
+                <button id="loginButton">Log In</button>
+                <button id="registerButton">Register</button>
+            </div>
+        </div>
+        
+        <!-- Main Section (when authenticated) -->
+        <div id="priceSection" class="hidden">
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <div class="tab active" data-tab="search">Search</div>
+                <div class="tab" data-tab="current">Current Product</div>
+                <div class="tab" data-tab="history">History</div>
+            </div>
+            
+            <!-- Search Tab -->
+            <div id="searchTab" class="tab-content active">
+                <form id="searchForm">
+                    <div class="form-group">
+                        <label for="searchInput">Search for a Product</label>
+                        <input type="text" id="searchInput" placeholder="e.g. iPhone 15 Pro">
+                    </div>
+                    <div class="form-group">
+                        <label for="productLinkInput">Or paste a Product Link</label>
+                        <input type="text" id="productLinkInput" placeholder="Paste link from Amazon, Flipkart, etc.">
+                    </div>
+                    <button type="submit" id="searchButton">Search</button>
+                    <button type="button" id="compareButton">Compare Prices</button>
+                </form>
+                
+                <div id="searchResults"></div>
+                <div id="results"></div>
+            </div>
+            
+            <!-- Current Product Tab -->
+            <div id="currentTab" class="tab-content">
+                <div id="prices"></div>
+                <button id="saveButton" class="hidden">Save Price History</button>
+            </div>
+            
+            <!-- History Tab -->
+            <div id="historyTab" class="tab-content">
+                <div id="priceHistory"></div>
+            </div>
+
+            <div id="status"></div>
+            <button id="logoutButton" class="hidden">Log Out</button>
+        </div>
+    </div>
+    
+    <script src="sidepanel.js"></script>
+</body>
+</html> 

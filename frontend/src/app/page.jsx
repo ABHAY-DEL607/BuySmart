@@ -188,7 +188,7 @@ const HomePage = () => {
             <h2 className="text-2xl font-bold text-slate-800">Supported E-commerce Sites</h2>
             <p className="text-slate-600 mt-2">Compare prices from all major Indian shopping platforms</p>
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+          {/* <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
             {platforms.map((platform) => (
               <div
                 key={platform.name}
@@ -207,7 +207,7 @@ const HomePage = () => {
                 />
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </section>
 

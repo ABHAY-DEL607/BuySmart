@@ -6,6 +6,7 @@ import { Star, HelpCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
+import { useSearchParams } from "next/navigation"
 
 const products = [
   {
@@ -181,11 +182,13 @@ const create3DBackground = (canvas) => {
 }
 
 const ProductComparison = () => {
-  const [sortedProducts, setSortedProducts] = useState(products)
+  const [sortedProducts, setSortedProducts] = useState([])
   const [priceHistory, setPriceHistory] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const canvasRef = useRef(null)
+  const searchParams = useSearchParams()
+  const query = searchParams.get('q')
 
   // Initialize 3D background and fetch price history
   useEffect(() => {
@@ -197,60 +200,48 @@ const ProductComparison = () => {
       }
     }
 
-    // Mock price history data since we don't have a real API
-    const mockPriceHistory = [
-      {
-        productName: "Smartphone XYZ",
-        currentSite: "Amazon",
-        currentPrice: 34999,
-        comparisons: [
-          { site: "Flipkart", price: 33999 },
-          { site: "JioMart", price: 35499 },
-        ],
-        createdAt: "2025-05-01T10:30:00Z",
-      },
-      {
-        productName: "Laptop ABC",
-        currentSite: "Flipkart",
-        currentPrice: 65999,
-        comparisons: [
-          { site: "Amazon", price: 67999 },
-          { site: "eBay", price: 66499 },
-        ],
-        createdAt: "2025-04-28T14:15:00Z",
-      },
-      {
-        productName: "Headphones Pro",
-        currentSite: "eBay",
-        currentPrice: 12999,
-        comparisons: [
-          { site: "Amazon", price: 13499 },
-          { site: "Paytm Mall", price: 13999 },
-        ],
-        createdAt: "2025-04-15T09:45:00Z",
-      },
-    ]
+    const fetchData = async () => {
+      if (!query) return
+      setIsLoading(true)
+      setError(null)
+      try {
+        const sites = ['amazon', 'flipkart', 'ebay', 'jiomart', 'paytmmall']
+        const results = await Promise.all(
+          sites.map(site =>
+            fetch(`http://localhost:5001/api/scrape/${site}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query })
+            }).then(res => res.json())
+          )
+        )
+        const validResults = results.filter(r => r && r.length > 0).flat()
+        setSortedProducts(validResults)
+      } catch (err) {
+        setError('Failed to fetch product data')
+        console.error(err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    // Simulate API fetch
-    setTimeout(() => {
-      setPriceHistory(mockPriceHistory)
-      setIsLoading(false)
-    }, 1000)
-  }, [])
+    fetchData()
+  }, [query])
 
   // Find the best deal
   const findBestDeal = (products) => {
+    if (!products || products.length === 0) return null
     return products.reduce((best, current) => {
-      const currentTotal = current.price + current.deliveryPrice + current.platformFee
-      const bestTotal = best.price + best.deliveryPrice + best.platformFee
+      const currentTotal = current.price
+      const bestTotal = best.price
       return currentTotal < bestTotal ? current : best
     }, products[0])
   }
 
-  const bestDeal = findBestDeal(products)
+  const bestDeal = findBestDeal(sortedProducts)
 
   const handleFilter = (value) => {
-    const sorted = [...products]
+    const sorted = [...sortedProducts]
 
     if (value === "price-asc") {
       sorted.sort((a, b) => a.price - b.price)
@@ -282,18 +273,18 @@ const ProductComparison = () => {
             <h2 className="text-2xl font-bold text-blue-800 mb-4">🏆 Best Deal</h2>
             <div className="flex flex-col md:flex-row items-center gap-6">
               <img
-                src={bestDeal.productImage || "/placeholder.svg"}
-                alt={bestDeal.site}
+                src={bestDeal?.productImage || "/placeholder.svg"}
+                alt={bestDeal?.site}
                 className="w-32 h-32 object-cover rounded-lg shadow-md"
               />
               <div>
-                <h3 className="text-xl font-semibold text-gray-800">{bestDeal.site}</h3>
-                <p className="text-green-600 text-lg font-bold">₹{bestDeal.price.toLocaleString()}</p>
-                <p className="text-amber-600">{bestDeal.discount}</p>
+                <h3 className="text-xl font-semibold text-gray-800">{bestDeal?.site}</h3>
+                <p className="text-green-600 text-lg font-bold">₹{bestDeal?.price.toLocaleString()}</p>
+                <p className="text-amber-600">{bestDeal?.discount}</p>
                 <p className="text-gray-700">
-                  Total Cost: ₹{(bestDeal.price + bestDeal.deliveryPrice + bestDeal.platformFee).toLocaleString()}
+                  Total Cost: ₹{(bestDeal?.price + bestDeal?.deliveryPrice + bestDeal?.platformFee).toLocaleString()}
                 </p>
-                <a href={bestDeal.link} target="_blank" rel="noopener noreferrer">
+                <a href={bestDeal?.link} target="_blank" rel="noopener noreferrer">
                   <Button className="mt-3 bg-blue-600 hover:bg-blue-700 transition-all hover:scale-105">
                     Get This Deal
                   </Button>
