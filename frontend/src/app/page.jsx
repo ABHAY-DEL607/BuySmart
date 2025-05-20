@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import * as THREE from 'three';
-import { Search, ShoppingCart, Zap } from 'lucide-react';
+import { Clock, PieChart, Search, ShoppingCart, Tag, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -233,12 +233,12 @@ const HomePage = () => {
             </div>
             <div className="flex flex-wrap justify-center items-center gap-10">
               {platforms.map((platform) => (
-                <motion.div
+                <div
                   key={platform.name}
                   whileHover={{ scale: 1.1 }}
                   className="flex items-center justify-center h-14"
                 >
-                  <Image
+                  <img
                     src={platform.src}
                     alt={`${platform.name} logo`}
                     width={140}
@@ -247,7 +247,7 @@ const HomePage = () => {
                     loading="lazy"
                     onError={(e) => (e.target.src = 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg')}
                   />
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
