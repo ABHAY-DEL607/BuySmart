@@ -117,4 +117,22 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+
+router.get('/getall', async (req, res) => {
+  try {
+    // Use MongoDB if connected, otherwise use in-memory DB
+    if (isConnected()) {
+      const users = await User.find();
+      res.status(200).json(users);
+    } else {
+      const users = inMemoryDB.getAllUsers();
+      res.status(200).json(users);
+    }
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
 module.exports = router;
