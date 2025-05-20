@@ -140,10 +140,10 @@ const HomePage = () => {
 
   const platforms = [
     { name: 'Amazon', src: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
-    { name: 'Flipkart', src: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Flipkart_Logo.svg' },
-    { name: 'JioMart', src: 'https://www.jiomart.com/assets/jiomart-default/logo.png' },
-    { name: 'Ebay', src: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg' },
-    { name: 'PaytmMall', src: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg' },
+    // { name: 'Flipkart', src: 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Flipkart_Logo.svg' },
+    // { name: 'JioMart', src: 'https://www.jiomart.com/assets/jiomart-default/logo.png' },
+    // { name: 'Ebay', src: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg' },
+    // { name: 'PaytmMall', src: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Generic_Logo.svg' },
   ];
 
   const howItWorks = [
