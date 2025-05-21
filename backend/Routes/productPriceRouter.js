@@ -75,14 +75,14 @@ router.get('/', async (req, res) => {
 });
 
 // Get a single product by ID
-router.get('/:id', authMiddleware, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
-        const userId = req.user.id;
+        // const userId = req.user.id;
         const productId = req.params.id;
         
         const product = await ProductPrice.findOne({
             _id: productId,
-            userId: userId
+            // userId: userId
         });
         
         if (!product) {
