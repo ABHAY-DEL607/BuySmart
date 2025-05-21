@@ -16,7 +16,6 @@ const SUPPORTED_SITES = [
 ];
 
 const Compare = () => {
-<<<<<<< HEAD
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
@@ -26,7 +25,7 @@ const Compare = () => {
   const [sortOrder, setSortOrder] = useState('asc'); // Price sorting: asc/desc
   const [selectedSites, setSelectedSites] = useState(SUPPORTED_SITES.map(s => s.id));
   const mountRef = useRef(null);
-=======
+}
     const router = useRouter();
     const searchParams = useSearchParams();
     const query = searchParams.get('q') || '';
@@ -77,7 +76,7 @@ const Compare = () => {
             }
             setIsLoading(false);
         };
->>>>>>> 633e37ac56721eebcd667801101533ee773ff328
+ 
 
   // 3D Background Setup with Three.js
   useEffect(() => {
@@ -468,6 +467,6 @@ const Compare = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Compare;
