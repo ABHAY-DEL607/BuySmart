@@ -10,7 +10,7 @@ export default function Navbar() {
           <Link href="/" className="text-slate-700 hover:text-indigo-600">Home</Link>
           <Link href="/about" className="text-slate-700 hover:text-indigo-600">About</Link>
           <Link href="/contact" className="text-slate-700 hover:text-indigo-600">Contact</Link>
-          <Link href="/history" className="text-slate-700 hover:text-indigo-600">Comparison History</Link>
+          <Link href="/user/history" className="text-slate-700 hover:text-indigo-600">Comparison History</Link>
           <Button className="bg-red-600 hover:bg-red-700 text-white">Log Out</Button>
         </div>
       </div>

@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./Routes/authRoutes');
 const User = require('./models/Users');
 const bcrypt = require('bcrypt');
+const productPriceRouter = require('./Routes/productPriceRouter');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -49,6 +50,7 @@ app.use(express.json());
 
 // Mount auth routes
 app.use('/auth', authRoutes);
+app.use('/api/prices', productPriceRouter);
 
 // Rate limiting middleware
 const rateLimiterMiddleware = async (req, res, next) => {
@@ -100,4 +102,4 @@ app.get('/health', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-}); 
+});

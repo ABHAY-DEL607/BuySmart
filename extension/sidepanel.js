@@ -443,6 +443,77 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Add a "Save All Products" button at the top of results
+        const saveAllContainer = document.createElement('div');
+        saveAllContainer.className = 'save-all-container';
+        saveAllContainer.innerHTML = '<button id="saveAllButton" class="save-all-btn">Save All Products</button>';
+        searchResults.appendChild(saveAllContainer);
+        
+        // Add functionality to the Save All button
+        const saveAllButton = document.getElementById('saveAllButton');
+        saveAllButton.addEventListener('click', async () => {
+            try {
+                // Get token from most reliable source
+                const token = await checkMultipleAuthSources();
+                
+                if (!token) {
+                    alert("Please log in to save products");
+                    return;
+                }
+                
+                saveAllButton.disabled = true;
+                saveAllButton.innerText = "Saving all products...";
+                
+                // Prepare all products for saving
+                const allProducts = results.map(product => ({
+                    productName: product.name,
+                    currentSite: product.site,
+                    currentPrice: product.price,
+                    productImage: product.image,
+                    productUrl: product.url
+                }));
+                
+                const response = await fetch(`${API_URL}/api/prices/batch`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ products: allProducts })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                saveAllButton.disabled = false;
+                saveAllButton.innerText = "All Products Saved ✓";
+                setTimeout(() => {
+                    saveAllButton.innerText = "Save All Products";
+                }, 2000);
+                
+                // Show success status
+                statusElement.textContent = 'All products saved successfully!';
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+                
+            } catch (err) {
+                console.error("Error saving all products:", err);
+                saveAllButton.disabled = false;
+                saveAllButton.innerText = "Error Saving";
+                setTimeout(() => {
+                    saveAllButton.innerText = "Save All Products";
+                }, 2000);
+                
+                // Show error status
+                statusElement.textContent = 'Failed to save products';
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                }, 3000);
+            }
+        });
+        
         const SUPPORTED_SITES = {
             amazon: {
                 name: 'Amazon',
@@ -504,7 +575,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'80\\' height=\\'80\\' viewBox=\\'0 0 100 100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'#f3f4f6\\'></rect><text x=\\'50\\' y=\\'50\\' font-family=\\'Arial\\' font-size=\\'12\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\' fill=\\'#6b7280\\'>No Image</text></svg>'">
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
-                        <div class="product-price">₹${product.price ? product.price.toLocaleString() : 'N/A'}</div>
+                        <div class="product-price">${product.price ? product.price.toLocaleString() : 'N/A'}</div>
                         <div class="product-rating">${product.rating ? `⭐ ${product.rating}` : 'No ratings'}</div>
                         <a href="${product.url}" target="_blank" class="view-product-btn" style="background-color: ${siteInfo.color}">
                             View on ${siteInfo.name}
@@ -724,4 +795,4 @@ document.addEventListener("DOMContentLoaded", function () {
     function resetCurrentProductFlag() {
         currentProductLoaded = false;
     }
-}); 
+});

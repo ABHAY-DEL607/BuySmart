@@ -113,7 +113,7 @@ const Login = () => {
                     return;
                 } else {
                     // Regular website flow - navigate to website home page
-                    router.push('/website-home');
+                    router.push('/');
                 }
                 // Reset form
                 resetForm();

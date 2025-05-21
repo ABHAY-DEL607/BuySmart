@@ -14,6 +14,7 @@ const notificationRoutes = require('./Routes/NotificationRoutes');
 const comparisionRoutes = require('./Routes/ComparisonRoutes');
 const platformRoutes = require('./Routes/platformRoutes');
 const sharingRoutes = require('./Routes/SharingRoutes');
+const productPriceRouter = require('./Routes/productPriceRouter');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -61,6 +62,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/comparisions', comparisionRoutes);
 app.use('/api/platforms', platformRoutes);
 app.use('/api/sharing', sharingRoutes);
+app.use('/api/prices', productPriceRouter);
 
 // Health check route
 app.get('/health', (req, res) => {

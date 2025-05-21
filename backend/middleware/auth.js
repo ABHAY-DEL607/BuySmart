@@ -4,7 +4,8 @@ const auth = async (req, res, next) => {
     try {
         // Get token from header
         const token = req.header('Authorization')?.replace('Bearer ', '');
-
+        console.log(`Token: ${token}`);
+        
         if (!token) {
             return res.status(401).json({
                 status: 'error',
@@ -17,8 +18,12 @@ const auth = async (req, res, next) => {
         
         // Add user from payload
         req.user = decoded;
+        console.log(decoded);
+        
         next();
     } catch (error) {
+        console.log(error);
+        
         res.status(401).json({
             status: 'error',
             message: 'Token is not valid'
