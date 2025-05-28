@@ -350,7 +350,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('searchForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const query = searchInput.value.trim();
-        const productLink = productLinkInput.value.trim();
+        const productLink = productLinkInput?.value?.trim() || '';
           
         if (!query && !productLink) {
             statusElement.textContent = 'Please enter a product name or paste a product link';
@@ -360,8 +360,17 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         
+        // Clear previous results first
+        searchResults.innerHTML = '';
+        resultsDiv.innerHTML = '';
+        
         // Show loading state
-        searchResults.innerHTML = '<div class="loading-container"><div class="loading"></div><p>Searching across all sites...</p></div>';
+        searchResults.innerHTML = `
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Searching across all sites...</p>
+            </div>
+        `;
         statusElement.textContent = 'Searching...';
         
         try {
@@ -373,14 +382,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 }, resolve);
             });
 
+            // Clear loading state
+            searchResults.innerHTML = '';
+
             if (response.error) {
-                searchResults.innerHTML = `<div class="error-message">Error: ${response.error}</div>`;
+                searchResults.innerHTML = `
+                    <div class="error-message">
+                        <p>Error: ${response.error}</p>
+                        <p>Please try again or try a different search term.</p>
+                    </div>
+                `;
                 statusElement.textContent = 'Search failed';
                 return;
             }
 
             if (!response.results || response.results.length === 0) {
-                searchResults.innerHTML = '<div class="error-message">No results found</div>';
+                searchResults.innerHTML = `
+                    <div class="error-message">
+                        <p>No products found for "${query}"</p>
+                        <p>Try using different keywords or check your spelling.</p>
+                    </div>
+                `;
                 statusElement.textContent = 'No results found';
                 return;
             }
@@ -389,7 +411,12 @@ document.addEventListener("DOMContentLoaded", function () {
             statusElement.textContent = 'Search complete';
         } catch (error) {
             console.error('Search error:', error);
-            searchResults.innerHTML = '<div class="error-message">Error searching products</div>';
+            searchResults.innerHTML = `
+                <div class="error-message">
+                    <p>Error searching products</p>
+                    <p>${error.message || 'Please try again later.'}</p>
+                </div>
+            `;
             statusElement.textContent = 'Search failed';
         }
     });
