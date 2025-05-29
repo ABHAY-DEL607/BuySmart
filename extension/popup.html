@@ -4,270 +4,693 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BuySmart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+        * {
             margin: 0;
-            padding: 15px;
-            width: 400px;
-            background: radial-gradient(circle at center, #ffffff 0%, #d4e6f1 70%, #a3bffa 100%);
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1), 0 4px 15px rgba(0, 0, 0, 0.2);
-            border-radius: 12px;
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 0.5s ease-in;
+            padding: 0;
+            box-sizing: border-box;
         }
-        canvas#bg-canvas {
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            width: 400px;
+            min-height: 600px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.05;
             z-index: -1;
-            opacity: 0.3;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        h1 {
-            font-size: 26px;
-            color: #2d3436;
-            text-align: center;
-            margin-bottom: 12px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-            background: linear-gradient(45deg, #0984e3, #00cec9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        #authSection {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        #authSection.hidden, #priceSection.hidden, #logoutButton.hidden, #saveButton.hidden, #smartTip.hidden {
-            display: none;
-        }
-        #authSection a, #logoutButton {
-            margin: 0 12px;
-            color: #ffffff;
-            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            border: none;
-        }
-        #authSection a:hover, #logoutButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-        }
-        #authSection a:active, #logoutButton:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        #authMessage {
-            color: #e74c3c;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        #searchForm {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        #searchInput, #productLinkInput {
-            padding: 10px;
-            border: 1px solid #dfe6e9;
-            border-radius: 20px;
-            outline: none;
-            background: #ffffff;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-            font-size: 14px;
-        }
-        #searchForm button {
-            padding: 10px;
-            border: none;
-            background: linear-gradient(45deg, #0984e3, #00b894);
+
+        /* Header */
+        .header {
+            background: var(--primary-gradient);
             color: white;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        #searchForm button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-        }
-        #searchForm button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        #searchResults, #prices, #results {
-            margin-top: 15px;
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-        .site-section {
-            margin-bottom: 15px;
-            border: 2px solid;
-            border-radius: 8px;
-            padding: 10px;
-        }
-        .site-header {
+            padding: 20px 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 10px;
+            gap: 16px;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
         }
-        .product-card {
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
             display: flex;
-            gap: 10px;
-            padding: 10px;
-            border-bottom: 1px solid #dfe6e9;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+            overflow: hidden;
         }
-        .product-image {
+
+        .logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .header-text h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(45deg, #ffffff, #f0f9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-text .subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        /* Content */
+        .content {
+            padding: 24px;
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        /* Auth Section */
+        #authSection {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .auth-icon {
             width: 80px;
             height: 80px;
-            object-fit: contain;
-            border-radius: 8px;
+            background: var(--success-gradient);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            margin: 0 auto 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            box-shadow: var(--shadow-xl);
+            animation: bounceIn 1s ease-out;
         }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .auth-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        /* Enhanced Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            min-height: 44px;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-danger {
+            background: var(--secondary-gradient);
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 240px;
+            margin: 0 auto;
+        }
+
+        /* Enhanced Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-icon {
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Enhanced Results */
+        .results-section {
+            margin-top: 24px;
+        }
+
+        .site-section {
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .site-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .site-header {
+            background: var(--bg-secondary);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .site-icon {
+            font-size: 18px;
+        }
+
+        .site-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .product-list {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--bg-tertiary);
+            transition: all 0.3s ease;
+        }
+
+        .product-item:hover {
+            background: var(--bg-secondary);
+            transform: translateX(4px);
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
         .product-info {
             flex: 1;
+            min-width: 0;
         }
+
         .product-name {
-            font-size: 14px;
-            margin: 0;
-            color: #2d3436;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.3;
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
+
         .product-price {
-            color: #e74c3c;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
         }
-        .product-rating, .product-stock {
+
+        .product-rating {
             font-size: 12px;
-            color: #636e72;
+            color: #f59e0b;
+            font-weight: 500;
         }
-        .view-product-btn {
-            display: inline-block;
-            padding: 6px 12px;
-            color: white;
+
+        .product-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #667eea;
             text-decoration: none;
-            border-radius: 15px;
-            font-size: 12px;
-            margin-top: 5px;
+            margin-top: 6px;
+            font-weight: 500;
         }
+
+        .product-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Enhanced Price Comparison */
+        .comparison-section {
+            margin-top: 20px;
+        }
+
+        .comparison-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .comparison-list {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .comparison-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--bg-tertiary);
+            transition: all 0.3s ease;
+        }
+
+        .comparison-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .comparison-item:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-site {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .comparison-price {
+            font-size: 14px;
+            font-weight: 700;
+            background: var(--success-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Enhanced Loading */
         .loading-container {
             text-align: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
-        .loading {
-            border: 4px solid #dfe6e9;
-            border-top: 4px solid #0984e3;
+
+        .loading-spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--bg-tertiary);
+            border-top: 3px solid #667eea;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 16px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .site-loading-indicators {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-        }
-        .site-loading {
-            font-size: 12px;
-            color: #636e72;
-        }
-        .error-message {
-            color: #e74c3c;
-            text-align: center;
-        }
-        #smartTip {
+
+        .loading-text {
             font-size: 14px;
-            color: #636e72;
-            text-align: center;
-            margin: 12px 0;
-            font-style: italic;
-            text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+            color: var(--text-secondary);
+            font-weight: 500;
         }
-        #status {
+
+        /* Enhanced Status */
+        .status-bar {
+            padding: 12px 20px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
             font-size: 12px;
-            color: #636e72;
+            color: var(--text-secondary);
             text-align: center;
-            margin-top: 10px;
+            font-weight: 500;
         }
-        
+
+        /* Enhanced Smart Tip */
+        .smart-tip {
+            background: var(--warning-gradient);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius-xl);
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight 0.6s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Enhanced Error */
+        .error-message {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 1px solid #fecaca;
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            color: #dc2626;
+            font-size: 13px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Action buttons */
         .action-buttons {
+            margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
+            gap: 12px;
         }
-        
-        #saveButton, #logoutButton {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 20px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
+
+        /* Hidden */
+        .hidden {
+            display: none !important;
         }
-        
-        #saveButton {
-            background: linear-gradient(45deg, #00b894, #00cec9);
+
+        /* Enhanced Scrollbar */
+        .content::-webkit-scrollbar,
+        .product-list::-webkit-scrollbar {
+            width: 6px;
         }
-        
-        #logoutButton {
-            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+
+        .content::-webkit-scrollbar-track,
+        .product-list::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 3px;
         }
-        
-        #saveButton:hover, #logoutButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+
+        .content::-webkit-scrollbar-thumb,
+        .product-list::-webkit-scrollbar-thumb {
+            background: var(--primary-gradient);
+            border-radius: 3px;
+        }
+
+        .content::-webkit-scrollbar-thumb:hover,
+        .product-list::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-gradient);
+        }
+
+        /* Micro-interactions */
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Success animations */
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .success-animation {
+            animation: successPulse 0.6s ease-out;
         }
     </style>
 </head>
-<body>
-    <canvas id="bg-canvas"></canvas>
-    <h1>BuySmart: Shop Savvy</h1>
-    <div id="authSection">
-        <a id="loginButton" href="#">Login</a>
-        <a id="registerButton" href="#">Register</a>
-        <div id="authMessage"></div>
-    </div>
-    <div id="priceSection" class="hidden">
-        <form id="searchForm">
-            <input type="text" id="searchInput" placeholder="Search for products...">
-            <input type="text" id="productLinkInput" placeholder="Paste product link (optional)">
-            <button type="submit">Search</button>
-            <button id="compareButton">Compare</button>
-        </form>
-        <div id="searchResults"></div>
-        <div id="prices"></div>
-        <div id="results"></div>
-        <div class="action-buttons">
-            <button id="saveButton" class="hidden">Save Price History</button>
-            <button id="logoutButton" class="hidden">Logout</button>
+<body>    <div class="header">
+        <div class="logo">
+            <img src="logo.png" alt="BuySmart Logo" class="logo-img">
+        </div>
+        <div class="header-text">
+            <h1>BuySmart</h1>
+            <div class="subtitle">Price Comparison Tool</div>
         </div>
     </div>
-    <p id="smartTip"></p>
-    <div id="status"></div>
+
+    <div class="content">
+        <!-- Smart Tip -->
+        <div id="smartTip" class="smart-tip hidden">
+            <span>💡</span>
+            <span>Compare prices across multiple sites to save money!</span>
+        </div>
+
+        <!-- Authentication Section -->
+        <div id="authSection">
+            <div class="auth-icon">👤</div>
+            <div class="auth-title">Welcome to BuySmart</div>
+            <div class="auth-subtitle">Sign in to start comparing prices and save money on your purchases</div>
+            <div class="auth-buttons">
+                <a id="loginButton" href="#" class="btn btn-primary">🔐 Sign In</a>
+                <a id="registerButton" href="#" class="btn btn-secondary">✨ Create Account</a>
+            </div>
+            <div id="authMessage"></div>
+        </div>
+
+        <!-- Main Section -->
+        <div id="priceSection" class="hidden">
+            <form id="searchForm">
+                <div class="form-group">
+                    <label class="form-label" for="searchInput">Search Products</label>
+                    <input type="text" id="searchInput" class="form-input" placeholder="e.g., iPhone 15, Samsung Galaxy S24">
+                </div>
+                <div class="search-actions">
+                    <button type="submit" class="btn btn-primary">🔍 Search Products</button>
+                    <button type="button" id="compareButton" class="btn btn-icon btn-secondary" title="Compare Prices">⚖️</button>
+                </div>
+            </form>
+
+            <div class="results-section">
+                <div id="searchResults"></div>
+                <div id="prices"></div>
+                <div id="results"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="saveButton" class="btn btn-primary hidden">💾 Save Price History</button>
+                <button id="logoutButton" class="btn btn-danger hidden">🚪 Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="status" class="status-bar hidden"></div>
+
     <script src="popup.js"></script>
 </body>
 </html>
