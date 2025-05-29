@@ -19,6 +19,7 @@ export default function ProductHistory() {
             try {
                 setLoading(true);
                 const token = localStorage.getItem('token');
+                console.log('Fetching saved products with token:', token);
                 
                 if (!token) {
                     router.push('/login?redirect=history');

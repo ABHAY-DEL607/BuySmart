@@ -70,6 +70,7 @@ const Login = () => {
                 const result = await axios.post(`${API_URL}/auth/login`, payload);
                 // Store token in localStorage
                 localStorage.setItem('token', result.data.token);
+                document.cookie = `token=${result.data.token}; path=/; secure; samesite=strict`;
                 // Store user info if available
                 if (result.data.user) {
                     localStorage.setItem('user', JSON.stringify(result.data.user));
