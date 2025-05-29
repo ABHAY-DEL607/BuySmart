@@ -132,10 +132,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.3);
             animation: pulse 2s ease-in-out infinite;
+            overflow: hidden;
+        }
+
+        .logo-img {
+            width: 120%;
+            height: 120%;
+            object-fit: cover;
+            
+
         }
 
         @keyframes pulse {
@@ -804,6 +812,7 @@
                 width: 40px;
                 height: 40px;
                 font-size: 20px;
+                background-color: #ffffff;
             }
 
             .header-text h1 {
@@ -867,11 +876,11 @@
         <div class="particle" style="left: 70%; animation-delay: 0.5s;"></div>
         <div class="particle" style="left: 80%; animation-delay: 1.5s;"></div>
         <div class="particle" style="left: 90%; animation-delay: 2.5s;"></div>
-    </div>
-
-    <header>
+    </div>    <header>
         <div class="header-content">
-            <div class="header-icon">🛒</div>
+            <div class="header-icon">
+                <img src="logo.png" alt="BuySmart Logo" class="logo-img">
+            </div>
             <div class="header-text">
                 <h1>BuySmart</h1>
                 <div class="subtitle">Smart Price Comparison</div>
@@ -900,12 +909,7 @@
         
         <!-- Main Section (when authenticated) -->
         <div id="priceSection" class="hidden">
-            <!-- Tab Navigation -->
-            <div class="tabs">
-                <div class="tab active" data-tab="search">🔍 Search</div>
-                <div class="tab" data-tab="current">📱 Current Product</div>
-                <div class="tab" data-tab="history">📊 History</div>
-            </div>
+            
             
             <!-- Search Tab -->
             <div id="searchTab" class="tab-content active">
@@ -924,16 +928,6 @@
                 <div id="results"></div>
             </div>
             
-            <!-- Current Product Tab -->
-            <div id="currentTab" class="tab-content">
-                <div id="prices"></div>
-                <button id="saveButton" class="btn btn-primary hidden" style="width: 100%; margin-top: 20px;">💾 Save Price History</button>
-            </div>
-            
-            <!-- History Tab -->
-            <div id="historyTab" class="tab-content">
-                <div id="priceHistory"></div>
-            </div>
 
             <div id="status"></div>
             <button id="logoutButton" class="btn btn-danger hidden" style="width: 100%; margin-top: 20px;">🚪 Sign Out</button>

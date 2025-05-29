@@ -19,63 +19,16 @@ const Compare = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
+  const category = searchParams.get('category') || '';
+  
   const [searchQuery, setSearchQuery] = useState(query);
   const [isLoading, setIsLoading] = useState(false);
   const [comparisons, setComparisons] = useState([]);
   const [sortOrder, setSortOrder] = useState('asc'); // Price sorting: asc/desc
   const [selectedSites, setSelectedSites] = useState(SUPPORTED_SITES.map(s => s.id));
   const mountRef = useRef(null);
-}
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const query = searchParams.get('q') || '';
-    const category = searchParams.get('category') || '';
     
-    const [searchQuery, setSearchQuery] = useState(query);
-    const [isLoading, setIsLoading] = useState(false);
-    const [comparisons, setComparisons] = useState([]);
-    
-    useEffect(() => {
-        const fetchComparisons = async () => {
-            if (!query) return;
-            setIsLoading(true);
-            setComparisons([]);
-            let allResults = [];
-            try {
-                await Promise.all(
-                    SUPPORTED_SITES.map(async (site) => {
-                        const searchUrl = getSearchUrl(site.id, query);
-                        const res = await fetch(`${API_URL}/api/scrape/${site.id}`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ query, url: searchUrl })
-                        });
-                        const data = await res.json();
-                        if (data.products && data.products.length > 0) {
-                            // Take the first product as the best match for now
-                            const p = data.products[0];
-                            allResults.push({
-                                site: site.name,
-                                price: p.price ? `₹${p.price.toLocaleString()}` : 'N/A',
-                                delivery: 'Free', // You can enhance this if your backend provides delivery info
-                                rating: p.rating || 'N/A',
-                                url: p.url || '#',
-                            });
-                        }
-                    })
-                );
-                if (allResults.length > 0) {
-                    setComparisons(allResults);
-                    toast.success(`Found prices for "${query}"`);
-                } else {
-                    toast.error(`No results found for "${query}"`);
-                }
-            } catch (err) {
-                console.error(err);
-                toast.error('Error fetching comparison data');
-            }
-            setIsLoading(false);
-        };
+
  
 
   // 3D Background Setup with Three.js
@@ -213,7 +166,7 @@ const Compare = () => {
   const filteredComparisons = comparisons
     .filter((item) => {
       const price = item.price !== 'N/A' ? parseInt(item.price.replace(/[^\d]/g, '')) : Infinity;
-      return price >= 100;
+      return price >= 100; // Filter out unrealistically low prices
     })
     .sort((a, b) => {
       const priceA = a.price !== 'N/A' ? parseInt(a.price.replace(/[^\d]/g, '')) : Infinity;
@@ -230,6 +183,7 @@ const Compare = () => {
       return currentPrice < bestPrice ? current : best;
     }, filteredComparisons[0]);
   };
+
   const bestDeal = getBestDeal();
 
   // Handle logout
@@ -467,6 +421,6 @@ const Compare = () => {
       </div>
     </div>
   );
-});
+};
 
 export default Compare;

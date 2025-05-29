@@ -60,6 +60,26 @@ router.post('/batch', async (req, res) => {
     }
 });
 
+// Search products by name
+router.get('/search', async (req, res) => {
+    try {
+        const { q } = req.query;
+        
+        if (!q) {
+            return res.status(400).json({ error: 'Search query is required' });
+        }
+        
+        const products = await ProductPrice.find({
+            productName: { $regex: q, $options: 'i' }
+        }).sort({ timestamp: -1 });
+        
+        res.json({ success: true, products });
+    } catch (error) {
+        console.error('Error searching products:', error);
+        res.status(500).json({ error: 'Failed to search products' });
+    }
+});
+
 // Get user's saved products
 router.get('/', async (req, res) => {
     try {
