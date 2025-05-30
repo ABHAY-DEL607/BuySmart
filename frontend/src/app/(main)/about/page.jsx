@@ -178,9 +178,9 @@ const AboutPage = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-slate-900 mb-8 leading-tight tracking-tight"
             >
-              Revolutionizing{" "}
+              Revolutionizing  Smart Shopping{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
-                Smart Shopping
+               
               </span>
               <br />
               <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-slate-700">in India</span>

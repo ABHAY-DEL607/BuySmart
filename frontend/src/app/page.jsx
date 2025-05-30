@@ -255,9 +255,9 @@ const HomePage = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold text-slate-900 mb-8 leading-tight"
             >
-              Find the Best{" "}
+              Find the Best Deals{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 animate-pulse">
-                Deals
+                
               </span>
               <br />
               <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-slate-700">Every Time</span>
