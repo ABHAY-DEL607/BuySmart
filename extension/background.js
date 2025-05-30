@@ -679,8 +679,12 @@ async function searchProducts(query, productLink) {
         }));
         
         const flatResults = results.flat();
-        console.log(`Total results across all sites: ${flatResults.length}`);
-        return flatResults;
+        // Filter out products with 'Shop on eBay' in their names
+        const filteredResults = flatResults.filter(product => 
+            !product.name?.toLowerCase().includes('shop on ebay')
+        );
+        console.log(`Total results across all sites: ${filteredResults.length} (after filtering)`);
+        return filteredResults;
     } catch (error) {
         console.error('Search error:', error);
         return [];
