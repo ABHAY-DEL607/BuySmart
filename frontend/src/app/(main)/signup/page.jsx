@@ -1,7 +1,7 @@
 'use client';
 import axios from 'axios';
 import { useFormik } from 'formik';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EXTENSION_ID } from '@/services/config';
 import { API_URL } from '@/services/config';
 import { toast } from 'react-hot-toast';
@@ -9,19 +9,43 @@ import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import SuppressedPath from '@/components/SuppressedPath';
 
+// Update the SignupSchema with enhanced email validation
 const SignupSchema = Yup.object().shape({
     username: Yup.string()
-        .min(2, 'Too Short!')
-        .max(50, 'Too Long!')
-        .required('Required'),
-    email: Yup.string().email('Invalid email').required('Required'),
-    password: Yup.string().required('Password nhi hai tumhara?')
-        .min(8, 'minimum 8 characters')
-        .matches(/[a-z]/, 'lowercase letter is required')
-        .matches(/[A-Z]/, 'uppercase letter is required')
-        .matches(/[0-9]/, 'number is required')
-        .matches(/\W/, 'special character is required'),
-    confirmPassword: Yup.string().required('confirm password is required')
+        .min(2, 'Username must be at least 2 characters')
+        .max(50, 'Username cannot exceed 50 characters')
+        .matches(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores')
+        .required('Username is required'),
+    email: Yup.string()
+        .required('Email is required')
+        .email('Invalid email format')
+        .matches(
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+            'Please enter a valid email address'
+        )
+        .test(
+            'domain-check',
+            'Please use a valid email domain',
+            (value) => {
+                if (!value) return true; // Skip validation if empty (required will catch this)
+                const domain = value.split('@')[1];
+                // Simple check for common domains and valid TLDs
+                // You can add more logic as needed
+                return !domain || 
+                       !domain.includes('example.com') &&
+                       !domain.includes('test.com') &&
+                       domain.match(/\.[a-z]{2,}$/);
+            }
+        ),
+    password: Yup.string()
+        .required('Password is required')
+        .min(8, 'Password must be at least 8 characters')
+        .matches(/[a-z]/, 'Password must include a lowercase letter')
+        .matches(/[A-Z]/, 'Password must include an uppercase letter')
+        .matches(/[0-9]/, 'Password must include a number')
+        .matches(/\W/, 'Password must include a special character'),
+    confirmPassword: Yup.string()
+        .required('Please confirm your password')
         .oneOf([Yup.ref('password'), null], 'Passwords must match')
 });
 
@@ -29,6 +53,13 @@ const Signup = () => {
     const router = useRouter();
     const [apiStatus, setApiStatus] = useState({ checked: false, online: false });
     const [isLoading, setIsLoading] = useState(false);
+
+    // Add this to your component to check email validity as the user types
+    const [emailCheckStatus, setEmailCheckStatus] = useState({
+        checking: false,
+        available: null,
+        message: ''
+    });
 
     // Check if the API is online
     React.useEffect(() => {
@@ -193,6 +224,57 @@ const Signup = () => {
         }
     };
 
+    // Add this useEffect for email availability checking
+    useEffect(() => {
+        const checkEmailAvailability = async () => {
+            // Only check if email is valid and has been touched
+            if (
+                !signupForm.errors.email && 
+                signupForm.touched.email && 
+                signupForm.values.email.trim() !== ''
+            ) {
+                setEmailCheckStatus({ checking: true, available: null, message: 'Checking availability...' });
+                
+                try {
+                    // You need to implement this endpoint in your backend
+                    const response = await axios.post(`${API_URL}/auth/check-email`, {
+                        email: signupForm.values.email
+                    });
+                    
+                    if (response.data.available) {
+                        setEmailCheckStatus({
+                            checking: false,
+                            available: true,
+                            message: 'This email is available'
+                        });
+                    } else {
+                        setEmailCheckStatus({
+                            checking: false,
+                            available: false,
+                            message: 'This email is already registered'
+                        });
+                    }
+                } catch (error) {
+                    setEmailCheckStatus({
+                        checking: false,
+                        available: null,
+                        message: 'Could not check email availability'
+                    });
+                    console.error('Error checking email:', error);
+                }
+            }
+        };
+        
+        // Debounce the check to prevent too many API calls
+        const debounceTimeout = setTimeout(() => {
+            checkEmailAvailability();
+        }, 500);
+        
+        return () => {
+            clearTimeout(debounceTimeout);
+        };
+    }, [signupForm.values.email, signupForm.errors.email, signupForm.touched.email]);
+
     return (
         <div>
             {!apiStatus.checked ? (
@@ -247,7 +329,7 @@ const Signup = () => {
                                             className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" aria-describedby="username-error" />
                                         <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
                                             <svg className="size-5 text-red-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" suppressHydrationWarning>
-                                                <SuppressedPath d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                                                <SuppressedPath d="M16 8A8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -260,28 +342,64 @@ const Signup = () => {
                                     }
                                 </div>
 
-                                {/* Email Field */}
+                                {/* Email Field with enhanced validation feedback */}
                                 <div>
                                     <label htmlFor="email" className="block text-sm mb-2 dark:text-white">Email address</label>
                                     <div className="relative">
-                                        <input type="email"
+                                        <input 
+                                            type="email"
                                             id="email"
+                                            name="email"
                                             onChange={signupForm.handleChange}
+                                            onBlur={signupForm.handleBlur}
                                             value={signupForm.values.email}
-                                            className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" aria-describedby="email-error" />
-                                        <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
-                                            <svg className="size-5 text-red-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" suppressHydrationWarning>
-                                                <SuppressedPath d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
-                                            </svg>
-                                        </div>
+                                            className={`py-2.5 sm:py-3 px-4 block w-full border rounded-lg sm:text-sm focus:ring-2
+                                                ${signupForm.touched.email && signupForm.errors.email
+                                                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
+                                                    : signupForm.touched.email && !signupForm.errors.email
+                                                    ? 'border-green-500 focus:border-green-500 focus:ring-green-500'
+                                                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-500'
+                                                } 
+                                                disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400`}
+                                            aria-describedby="email-error"
+                                        />
+                                        
+                                        {/* Show appropriate icon based on validation state */}
+                                        {signupForm.touched.email && (
+                                            <div className="absolute inset-y-0 end-0 flex items-center pointer-events-none pe-3">
+                                                {signupForm.errors.email ? (
+                                                    <svg className="size-5 text-red-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" suppressHydrationWarning>
+                                                        <path d="M16 8A8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                                                    </svg>
+                                                ) : (
+                                                    <svg className="size-5 text-green-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                                                        <path d="M16 8A8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                                                    </svg>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
-                                    {
-                                        (signupForm.touched.email && signupForm.errors.email) && (
-                                            <p className="text-xs text-red-600 mt-2" id="email-error">
-                                                {signupForm.errors.email}
-                                            </p>
-                                        )
-                                    }
+                                    
+                                    {/* Enhanced error message with more helpful feedback */}
+                                    {signupForm.touched.email && signupForm.errors.email && (
+                                        <p className="text-xs text-red-600 mt-2" id="email-error">
+                                            {signupForm.errors.email}
+                                        </p>
+                                    )}
+                                    
+                                    {/* Success message when email is valid */}
+                                    {signupForm.touched.email && !signupForm.errors.email && signupForm.values.email && (
+                                        <p className="text-xs text-green-600 mt-2">
+                                            Valid email format
+                                        </p>
+                                    )}
+                                    
+                                    {/* Email format hint */}
+                                    {!signupForm.touched.email && (
+                                        <p className="text-xs text-gray-500 mt-1">
+                                            Please enter a valid email (e.g., user@example.com)
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Password Field */}
@@ -295,7 +413,7 @@ const Signup = () => {
                                         
                                         <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
                                             <svg className="size-5 text-red-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" suppressHydrationWarning>
-                                                <SuppressedPath d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                                                <SuppressedPath d="M16 8A8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -346,7 +464,7 @@ const Signup = () => {
                                             className="py-2.5 sm:py-3 px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" aria-describedby="confirm-password-error" />
                                         <div className="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
                                             <svg className="size-5 text-red-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true" suppressHydrationWarning>
-                                                <SuppressedPath d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+                                                <SuppressedPath d="M16 8A8 0 1 1 0 8a8 8 0 0 1 16 0zM8 4a.905.905 0 0 0-.9.995l.35 3.507a.552.552 0 0 0 1.1 0l.35-3.507A.905.905 0 0 0 8 4zm.002 6a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
                                             </svg>
                                         </div>
                                     </div>
@@ -387,6 +505,35 @@ const Signup = () => {
                                         </>
                                     ) : !signupForm.isValid && signupForm.dirty ? 'Please fix form errors' : 'Sign up'}
                                 </button>
+
+                                {/* Email availability status */}
+                                {emailCheckStatus.checking && (
+                                    <p className="text-xs text-blue-600 mt-2 flex items-center">
+                                        <svg className="animate-spin h-3 w-3 mr-1" viewBox="0 0 24 24" fill="none">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Checking email availability...
+                                    </p>
+                                )}
+
+                                {!emailCheckStatus.checking && emailCheckStatus.available === false && (
+                                    <p className="text-xs text-red-600 mt-2 flex items-center">
+                                        <svg className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                        </svg>
+                                        This email is already registered
+                                    </p>
+                                )}
+
+                                {!emailCheckStatus.checking && emailCheckStatus.available === true && (
+                                    <p className="text-xs text-green-600 mt-2 flex items-center">
+                                        <svg className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                        This email is available
+                                    </p>
+                                )}
                             </div>
                         </form>
                     </div>
