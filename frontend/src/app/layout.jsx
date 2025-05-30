@@ -2,7 +2,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import dynamic from 'next/dynamic';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/navbar';
 import PrelineScript from '@/components/PrelineScript';
 // import HydrationFixer from '@/components/HydrationFixer';
 
