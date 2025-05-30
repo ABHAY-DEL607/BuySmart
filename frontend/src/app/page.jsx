@@ -274,32 +274,7 @@ const HomePage = () => {
               <span className="text-indigo-600 font-semibold"> Smart shopping made simple.</span>
             </motion.p>
 
-            {/* Search Form */}
-            <motion.form
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              onSubmit={handleSearch}
-              className="max-w-3xl mx-auto mb-12"
-            >
-              <div className="flex flex-col sm:flex-row gap-4 p-2 bg-white rounded-2xl shadow-2xl border border-gray-200">
-                <Input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for products... (e.g., iPhone 15, Samsung TV)"
-                  className="flex-1 text-lg py-6 px-6 border-0 rounded-xl focus:ring-0 focus:outline-none bg-transparent placeholder:text-slate-400"
-                />
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-8 py-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                >
-                  <Search className="w-5 h-5 mr-2" />
-                  Compare Now
-                </Button>
-              </div>
-            </motion.form>
+
 
             {/* Stats */}
             <motion.div
