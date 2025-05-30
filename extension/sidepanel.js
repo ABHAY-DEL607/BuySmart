@@ -452,7 +452,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     ${response.prices.map(({ site, price }) => `
                         <div class="price-comparison">
                             <span class="site-name">${site}</span>
-                            <span class="price-value">₹${price}</span>
+                            <span class="price-value">${price}</span>
                         </div>
                     `).join('')}
                 </div>
@@ -597,13 +597,16 @@ document.addEventListener("DOMContentLoaded", function () {
             products.forEach(product => {
                 const productCard = document.createElement('div');
                 productCard.className = 'product-card';
+                // Add this to improve spacing and readability
                 productCard.innerHTML = `
                     <img src="${product.image}" alt="${product.name}" class="product-image" 
                         onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'80\\' height=\\'80\\' viewBox=\\'0 0 100 100\\'><rect width=\\'100\\' height=\\'100\\' fill=\\'#f3f4f6\\'></rect><text x=\\'50\\' y=\\'50\\' font-family=\\'Arial\\' font-size=\\'12\\' text-anchor=\\'middle\\' dominant-baseline=\\'middle\\' fill=\\'#6b7280\\'>No Image</text></svg>'">
                     <div class="product-info">
                         <h3 class="product-name">${product.name}</h3>
-                        <div class="product-price">${product.price ? product.price.toLocaleString() : 'N/A'}</div>
-                        <div class="product-rating">${product.rating ? `⭐ ${product.rating}` : 'No ratings'}</div>
+                        <div class="product-details">
+                            <div class="product-price">${product.price ? product.price : 'N/A'}</div>
+                            <div class="product-rating">${product.rating ? `⭐ ${product.rating}` : 'No ratings'}</div>
+                        </div>
                         <a href="${product.url}" target="_blank" class="view-product-btn" style="background-color: ${siteInfo.color}">
                             View on ${siteInfo.name}
                         </a>
@@ -637,11 +640,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             const { name, price, site, discount, image, rating, url } = response.data;
+            
+            // Remove currency symbols from displayed price to avoid duplicates
+            const displayPrice = price ? price.replace(/^₹|₹\s*/g, '') : 'N/A';
+            
             let priceHTML = `
                 <div class="product-header">
                     ${image ? `<img src="${image}" alt="${name}" class="product-image">` : ''}
                     <h3>${name}</h3>
-                    <p class="current-price"><strong>${site} Price:</strong> ₹${price}</p>
+                    <p class="current-price"><strong>${site} Price:</strong> ${price}</p>
                 </div>
             `;
 
@@ -693,7 +700,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     ${comparisonResponse.prices.map(({ site, price }) => `
                         <div class="price-comparison">
                             <span class="site-name">${site}</span>
-                            <span class="price-value">₹${price}</span>
+                            <span class="price-value">${price}</span>
                         </div>
                     `).join('')}
                 </div>
@@ -789,12 +796,17 @@ document.addEventListener("DOMContentLoaded", function () {
             const historyHTML = data.map(item => `
                 <div class="history-item">
                     <div class="history-product">
-                        ${item.productImage ? `<img src="${item.productImage}" alt="${item.productName}">` : ''}
-                        <div>
-                            <h3>${item.productName}</h3>
-                            <p>Saved on: ${new Date(item.timestamp).toLocaleString()}</p>
-                            <p>Price on ${item.currentSite}: ₹${item.currentPrice}</p>
-                            ${item.productUrl ? `<a href="${item.productUrl}" target="_blank" class="view-product-btn">View Product</a>` : ''}
+                        <div class="product-image-container">
+                            ${item.productImage ? 
+                              `<img src="${item.productImage}" alt="${item.productName}" class="history-product-image">` : 
+                              `<div class="no-image">No Image</div>`}
+                        </div>
+                        <div class="history-product-details">
+                            <h3 title="${item.productName}">${item.productName}</h3>
+                            <p class="history-timestamp">Saved on: ${new Date(item.timestamp).toLocaleString()}</p>
+                            <p class="history-price">Price: <span class="highlight-price">${item.currentPrice}</span></p>
+                            ${item.productUrl ? 
+                              `<a href="${item.productUrl}" target="_blank" class="view-product-btn">View Product</a>` : ''}
                         </div>
                     </div>
                     <div class="history-prices">
@@ -803,7 +815,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             ${item.comparisons.map(comp => `
                                 <div class="price-comparison">
                                     <span class="site-name">${comp.site}</span>
-                                    <span class="price-value">₹${comp.price}</span>
+                                    <span class="price-value">${comp.price}</span>
                                 </div>
                             `).join('')}
                         </div>
@@ -822,4 +834,25 @@ document.addEventListener("DOMContentLoaded", function () {
     function resetCurrentProductFlag() {
         currentProductLoaded = false;
     }
+
+    // Implement better error display
+    function showError(element, message, timeout = 0) {
+        element.innerHTML = `<div class="error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>${message}</span>
+        </div>`;
+        
+        if (timeout > 0) {
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, timeout);
+        }
+    }
+
+    // Example usage of showError
+    // showError(searchResults, 'No results found', 0);
 });

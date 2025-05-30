@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
+import toast from "react-hot-toast"; // Use react-hot-toast instead of sonner
 import {
   Menu,
   X,
@@ -21,8 +22,10 @@ import {
 import { motion } from "framer-motion";
 
 export default function Navbar() {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -33,6 +36,23 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      setIsAuthenticated(!!token);
+    };
+
+    // Check on initial load
+    checkAuth();
+
+    // Set up event listener for storage changes (in case user logs in/out in another tab)
+    window.addEventListener("storage", checkAuth);
+
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
+  }, []);
+
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/about", label: "About", icon: Info },
@@ -41,6 +61,57 @@ export default function Navbar() {
   ];
 
   const isActive = (href) => pathname === href;
+
+  const handleLogout = () => {
+    try {
+      // Clear authentication data
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Clear cookies
+      document.cookie =
+        "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+      document.cookie =
+        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
+      // Update authentication state
+      setIsAuthenticated(false);
+
+      // Show success message with react-hot-toast
+      toast.success("Successfully logged out", {
+        duration: 3000,
+        position: "bottom-center",
+        style: {
+          background: "#10B981",
+          color: "#fff",
+          padding: "12px 16px",
+          borderRadius: "8px",
+        },
+        iconTheme: {
+          primary: "#fff",
+          secondary: "#10B981",
+        },
+      });
+
+      // Redirect to home page and refresh
+      router.push("/login");
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Something went wrong during logout", {
+        duration: 3000,
+        position: "bottom-center",
+        style: {
+          background: "#EF4444",
+          color: "#fff",
+          padding: "12px 16px",
+          borderRadius: "8px",
+        },
+      });
+    }
+  };
 
   return (
     <>
@@ -108,25 +179,52 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-            </div>            <div className="hidden lg:flex items-center space-x-3">
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-                className="border-gray-300 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-300"
-              >
-                <Link href="/user/profile">
-                  <User className="w-4 h-4 mr-2" />
-                  Profile
-                </Link>
-              </Button>
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Log Out
-              </Button>
+            </div>
+            <div className="hidden lg:flex items-center space-x-3">
+              {isAuthenticated ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="border-gray-300 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-300"
+                  >
+                    <Link href="/user/profile">
+                      <User className="w-4 h-4 mr-2" />
+                      Profile
+                    </Link>
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleLogout}
+                    className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Log Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="border-gray-300 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-300"
+                  >
+                    <Link href="/login">
+                      <User className="w-4 h-4 mr-2" />
+                      Login
+                    </Link>
+                  </Button>
+                  <Button
+                    size="sm"
+                    asChild
+                    className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Link href="/register">Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             <div className="lg:hidden">
@@ -211,21 +309,54 @@ export default function Navbar() {
                     </div>
 
                     <div className="p-6 border-t border-gray-200 space-y-3">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start border-gray-300 hover:border-indigo-300 hover:bg-indigo-50"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <User className="w-4 h-4 mr-3" />
-                        Profile Settings
-                      </Button>
-                      <Button
-                        className="w-full justify-start bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <LogOut className="w-4 h-4 mr-3" />
-                        Log Out
-                      </Button>
+                      {isAuthenticated ? (
+                        <>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start border-gray-300 hover:border-indigo-300 hover:bg-indigo-50"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            asChild
+                          >
+                            <Link href="/user/profile">
+                              <User className="w-4 h-4 mr-3" />
+                              Profile Settings
+                            </Link>
+                          </Button>
+                          <Button
+                            className="w-full justify-start bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+                            onClick={() => {
+                              setIsMobileMenuOpen(false);
+                              handleLogout();
+                            }}
+                          >
+                            <LogOut className="w-4 h-4 mr-3" />
+                            Log Out
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start border-gray-300 hover:border-indigo-300 hover:bg-indigo-50"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            asChild
+                          >
+                            <Link href="/login">
+                              <User className="w-4 h-4 mr-3" />
+                              Login
+                            </Link>
+                          </Button>
+                          <Button
+                            className="w-full justify-start bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            asChild
+                          >
+                            <Link href="/register">
+                              Sign Up
+                            </Link>
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </SheetContent>
